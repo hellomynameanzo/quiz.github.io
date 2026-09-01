@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Kuis Multi-Mode Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
+            --card-bg: rgba(30, 41, 59, 0.75);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --accent-main: #8b5cf6;
+            --accent-secondary: #ff2a5f;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            touch-action: manipulation;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 16px;
+            transition: background 0.5s ease;
+        }
+
+        .container {
+            background: var(--card-bg);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 28px;
+            padding: 32px 28px;
+            width: 100%;
+            max-width: 760px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 0 0 40px rgba(139, 92, 246, 0.2);
+            text-align: center;
+            border: 1px solid var(--card-border);
+            animation: fadeIn 0.4s ease-out;
+            position: relative;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-top: 0;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, var(--accent-main), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-main), var(--accent-secondary));
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .mode-selection-wrapper {
+            position: relative;
+            min-height: 420px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 15px;
+        }
+
+        .mode-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 22px 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mode-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent);
+            pointer-events: none;
+        }
+
+        .mode-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: var(--accent-main);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        .mode-card i {
+            font-size: 2.4rem;
+            margin-bottom: 4px;
+            transition: transform 0.3s ease;
+        }
+
+        .mode-card:hover i {
+            transform: scale(1.15);
+        }
+
+        .mode-card .mode-title {
+            font-size: 1rem;
+            font-weight: 700;
+        }
+
+        .mode-card .teacher-tag {
+            font-size: 0.75rem;
+            opacity: 0.85;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .mode-pu { background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(217, 70, 239, 0.25)); border-color: #8b5cf6; }
+        .mode-mtk { background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(239, 68, 68, 0.25)); border-color: #f59e0b; }
+        .mode-ing { background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(59, 130, 246, 0.25)); border-color: #06b6d4; }
+        .mode-ipa { background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(20, 184, 166, 0.25)); border-color: #10b981; }
+        .mode-ips { background: linear-gradient(135deg, rgba(249, 115, 22, 0.25), rgba(217, 119, 6, 0.25)); border-color: #f97316; }
+        .mode-agama { background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(59, 130, 246, 0.25)); border-color: #10b981; }
+        .mode-infor { background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(168, 85, 247, 0.25)); border-color: #6366f1; }
+        .mode-pkn { background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(245, 158, 11, 0.25)); border-color: #ef4444; }
+        .mode-seni { background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(168, 85, 247, 0.25)); border-color: #ec4899; }
+
+        .pagination-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .page-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: var(--accent-main);
+            transform: scale(1.1);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .page-indicator {
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            color: var(--text-sub);
+        }
+
+        .q-number {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .teacher-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-left: 5px solid var(--accent-main);
+            padding: 24px;
+            border-radius: 18px;
+            text-align: left;
+            margin-bottom: 24px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .teacher-name {
+            font-weight: 700;
+            color: var(--accent-main);
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #question-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 16px 20px;
+            margin: 12px 0 20px 0;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+            background: rgba(15, 23, 42, 0.8);
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--accent-main);
+            box-shadow: 0 0 18px rgba(139, 92, 246, 0.35);
+        }
+
+        .btn-action {
+            background: linear-gradient(135deg, var(--accent-main) 0%, var(--accent-secondary) 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn-back-menu {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin-top: 12px;
+        }
+
+        .btn-back-menu:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .game-grid button {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid var(--card-border);
+            color: #fff;
+            padding: 14px;
+            font-size: 0.9rem;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .game-grid button:hover {
+            background: var(--accent-main);
+        }
+
+        .game-area {
+            background: rgba(15, 23, 42, 0.6);
+            padding: 24px;
+            border-radius: 16px;
+            border: 1px solid var(--card-border);
+            margin-top: 20px;
+        }
+
+        canvas {
+            background: #090d16;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 100%;
+        }
+
+        .click-box {
+            width: 120px;
+            height: 120px;
+            background: var(--accent-secondary);
+            margin: 20px auto;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 0 20px rgba(255, 42, 95, 0.4);
+            transition: transform 0.1s;
+            user-select: none;
+        }
+
+        .click-box:active {
+            transform: scale(0.95);
+        }
+
+        .mobile-controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .touch-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 15px;
+            font-size: 1.1rem;
+            border-radius: 12px;
+            flex: 1;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .touch-btn:active {
+            background: var(--accent-main);
+        }
+
+        .chat-toggle-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-secondary));
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .chat-toggle-btn:hover {
+            transform: scale(1.08);
+        }
+
+        .chat-window {
+            position: fixed;
+            bottom: 95px;
+            right: 25px;
+            width: 360px;
+            max-width: calc(100vw - 50px);
+            height: 500px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 1000;
+        }
+
+        .chat-header {
+            background: rgba(30, 41, 59, 0.8);
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chat-bubble {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .chat-bubble.bot {
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid var(--card-border);
+            color: #f8fafc;
+            align-self: flex-start;
+        }
+
+        .chat-bubble.user {
+            background: linear-gradient(135deg, var(--accent-main), var(--accent-secondary));
+            color: white;
+            align-self: flex-end;
+        }
+
+        .chat-quick-actions {
+            padding: 8px 12px;
+            background: rgba(15, 23, 42, 0.5);
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .quick-btn {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #e2e8f0;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            border-radius: 12px;
+            white-space: nowrap;
+            cursor: pointer;
+        }
+
+        .quick-btn:hover {
+            background: var(--accent-main);
+        }
+
+        .chat-footer {
+            padding: 10px 12px;
+            background: rgba(30, 41, 59, 0.8);
+            border-top: 1px solid var(--card-border);
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-footer input {
+            margin: 0;
+            padding: 10px 14px;
+            font-size: 0.88rem;
+        }
+
+        .chat-footer button {
+            width: 42px;
+            padding: 0;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="main-container">
+    
+    <div id="mode-screen" class="mode-selection-wrapper">
+        <h2><i class="fa-solid fa-gamepad"></i> PILIH MODE KUIS</h2>
+        
+        <div id="page-1" class="mode-grid">
+            <div class="mode-card mode-pu" onclick="selectMode('pu')">
+                <i class="fa-solid fa-graduation-cap" style="color: #a855f7;"></i>
+                <span class="mode-title">Pengetahuan Umum</span>
+                <span class="teacher-tag">Pak Budi</span>
+            </div>
+
+            <div class="mode-card mode-mtk" onclick="selectMode('mtk')">
+                <i class="fa-solid fa-calculator" style="color: #f59e0b;"></i>
+                <span class="mode-title">Matematika</span>
+                <span class="teacher-tag">Bu Anisa</span>
+            </div>
+
+            <div class="mode-card mode-ing" onclick="selectMode('ing')">
+                <i class="fa-solid fa-language" style="color: #06b6d4;"></i>
+                <span class="mode-title">Bahasa Inggris</span>
+                <span class="teacher-tag">Mr. John</span>
+            </div>
+
+            <div class="mode-card mode-ipa" onclick="selectMode('ipa')">
+                <i class="fa-solid fa-flask" style="color: #10b981;"></i>
+                <span class="mode-title">IPA</span>
+                <span class="teacher-tag">Pak Hendra</span>
+            </div>
+
+            <div class="mode-card mode-ips" onclick="selectMode('ips')">
+                <i class="fa-solid fa-earth-americas" style="color: #f97316;"></i>
+                <span class="mode-title">IPS</span>
+                <span class="teacher-tag">Bu Siska</span>
+            </div>
+        </div>
+
+        <div id="page-2" class="mode-grid hidden">
+            <div class="mode-card mode-agama" onclick="selectMode('agama')">
+                <i class="fa-solid fa-book-quran" style="color: #10b981;"></i>
+                <span class="mode-title">Agama Islam</span>
+                <span class="teacher-tag">Pak Ahmad</span>
+            </div>
+
+            <div class="mode-card mode-infor" onclick="selectMode('infor')">
+                <i class="fa-solid fa-laptop-code" style="color: #6366f1;"></i>
+                <span class="mode-title">Informatika</span>
+                <span class="teacher-tag">Pak Kevin</span>
+            </div>
+
+            <div class="mode-card mode-pkn" onclick="selectMode('pkn')">
+                <i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i>
+                <span class="mode-title">PPKn</span>
+                <span class="teacher-tag">Bu Ratna</span>
+            </div>
+
+            <div class="mode-card mode-seni" onclick="selectMode('seni')">
+                <i class="fa-solid fa-palette" style="color: #ec4899;"></i>
+                <span class="mode-title">Seni Budaya</span>
+                <span class="teacher-tag">Pak Doni</span>
+            </div>
+        </div>
+
+        <div class="pagination-container">
+            <button class="page-btn" id="prev-page" onclick="changePage(-1)" disabled><i class="fa-solid fa-chevron-left"></i></button>
+            <span class="page-indicator" id="page-indicator">1 / 2</span>
+            <button class="page-btn" id="next-page" onclick="changePage(1)"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+        <h2 id="mode-header-title"><i class="fa-solid fa-graduation-cap"></i> KELAS PAK BUDI</h2>
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progress-bar"></div>
+        </div>
+        <div class="q-number" id="q-counter"><i class="fa-solid fa-bullseye"></i> Pertanyaan 1 dari 99</div>
+        <div class="teacher-box" id="teacher-box-element">
+            <div class="teacher-name" id="teacher-display-name"><i class="fa-solid fa-user-tie"></i> Pak Budi</div>
+            <div id="question-text">Memuat pertanyaan...</div>
+        </div>
+        <input type="text" id="answer-input" placeholder="Tulis jawabanmu di sini..." onkeypress="handleKeyPress(event)" autocomplete="off">
+        <button class="btn-action" onclick="checkAnswer()"><i class="fa-solid fa-paper-plane"></i> Kirim Jawaban</button>
+        <button class="btn-action btn-back-menu" onclick="returnToMenu()"><i class="fa-solid fa-house"></i> Kembali ke Menu Mode</button>
+        <div id="quiz-feedback" style="margin-top: 15px; font-weight: 700;"></div>
+    </div>
+
+    <div id="punishment-screen" class="hidden">
+        <h2 style="background: linear-gradient(to right, #ef4444, #f97316); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+            <i class="fa-solid fa-circle-xmark"></i> JAWABAN SALAH!
+        </h2>
+        <p id="wrong-reason" style="color: #cbd5e1; font-weight: 600;"></p>
+        <p style="color: var(--text-sub); font-size: 0.95rem;">Selesaikan salah satu <strong>Mini Game Hukuman</strong> untuk melanjutkan:</p>
+        
+        <div class="game-grid">
+            <button onclick="startGame(1)"><i class="fa-solid fa-hashtag"></i> Tebak Angka</button>
+            <button onclick="startGame(2)"><i class="fa-solid fa-bolt"></i> Tes Refleks</button>
+            <button onclick="startGame(3)"><i class="fa-solid fa-hand-back-fist"></i> Suit Guru</button>
+            <button onclick="startGame(4)"><i class="fa-solid fa-calculator"></i> Math Blitz</button>
+            <button onclick="startGame(5)"><i class="fa-solid fa-gamepad"></i> Dodge Square</button>
+        </div>
+    </div>
+
+    <div id="game-container" class="hidden">
+        <div id="game-1" class="game-area hidden">
+            <h3><i class="fa-solid fa-hashtag"></i> Tebak Angka Rahasia (1-50)</h3>
+            <input type="number" id="g1-input" min="1" max="50" placeholder="Masukkan angka...">
+            <button class="btn-action" onclick="playGame1()">Tebak Sekarang</button>
+            <p id="g1-msg" style="margin-top: 15px; font-weight: 700;"></p>
+        </div>
+
+        <div id="game-2" class="game-area hidden">
+            <h3><i class="fa-solid fa-bolt"></i> Tes Refleks Cepat</h3>
+            <div id="g2-box" class="click-box" onclick="playGame2()">TUNGGU...</div>
+            <p id="g2-msg" style="font-weight: 700;"></p>
+        </div>
+
+        <div id="game-3" class="game-area hidden">
+            <h3><i class="fa-solid fa-hand-back-fist"></i> Batu Gunting Kertas</h3>
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <button class="btn-action" onclick="playGame3('Batu')">✊ Batu</button>
+                <button class="btn-action" onclick="playGame3('Gunting')">✌️ Gunting</button>
+                <button class="btn-action" onclick="playGame3('Kertas')">✋ Kertas</button>
+            </div>
+            <p id="g3-msg" style="margin-top: 20px; font-weight: 700;"></p>
+        </div>
+
+        <div id="game-4" class="game-area hidden">
+            <h3><i class="fa-solid fa-calculator"></i> Math Blitz</h3>
+            <h2 id="g4-math-question" style="color: var(--accent-yellow); -webkit-text-fill-color: initial; margin: 15px 0;"></h2>
+            <input type="number" id="g4-input" placeholder="Masukkan hasil...">
+            <button class="btn-action" onclick="playGame4()">Kirim Jawaban</button>
+            <p id="g4-msg" style="margin-top: 15px; font-weight: 700;"></p>
+        </div>
+
+        <div id="game-5" class="game-area hidden">
+            <h3><i class="fa-solid fa-gamepad"></i> Dodge Square</h3>
+            <canvas id="g5-canvas" width="300" height="200"></canvas>
+            <div class="mobile-controls">
+                <button class="touch-btn" id="btn-left">◀ KIRI</button>
+                <button class="touch-btn" id="btn-right">KANAN ▶</button>
+            </div>
+            <p id="g5-msg" style="margin-top: 15px; font-weight: 700;"></p>
+            <button class="btn-action" id="g5-start-btn" onclick="startDodgeGame()" style="margin-top: 10px;">Mulai Bermain</button>
+        </div>
+
+        <div id="result-message" style="margin-top: 15px; font-weight: bold;"></div>
+        <button id="back-btn" class="btn-action hidden" onclick="nextQuestion()" style="background: linear-gradient(135deg, var(--accent-green) 0%, #059669 100%); margin-top: 20px;">
+            Lanjut Pertanyaan Berikutnya <i class="fa-solid fa-arrow-right"></i>
+        </button>
+    </div>
+</div>
+
+<button class="chat-toggle-btn" onclick="toggleChat()"><i class="fa-solid fa-robot"></i></button>
+
+<div class="chat-window hidden" id="chat-window">
+    <div class="chat-header">
+        <h4 id="chat-title" style="margin: 0; color: var(--accent-secondary); font-size: 0.95rem;"><i class="fa-solid fa-robot"></i> Asisten Guru</h4>
+        <button style="background: none; border: none; color: var(--text-sub); cursor: pointer;" onclick="toggleChat()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="chat-body" id="chat-body">
+        <div class="chat-bubble bot">Halo! Saya Asisten AI. Siap membantu memberikan bocoran hint kuis atau kunci mini game! 😉</div>
+    </div>
+    
+    <div class="chat-quick-actions">
+        <button class="quick-btn" onclick="triggerQuickAction('Bocoran Kuis')">🔓 Hint Soal</button>
+        <button class="quick-btn" onclick="triggerQuickAction('Bantuan Mini Game')">🎮 Bocor Game</button>
+    </div>
+
+    <div class="chat-footer">
+        <input type="text" id="chat-input" placeholder="Tanya sesuatu..." onkeypress="handleChatKeyPress(event)">
+        <button class="btn-action" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+    </div>
+</div>
+
+<script>
+    const modeConfig = {
+        pu: { name: "Pengetahuan Umum", teacher: "Pak Budi", theme: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%)", accent: "#8b5cf6" },
+        mtk: { name: "Matematika", teacher: "Bu Anisa", theme: "linear-gradient(135deg, #1c1917 0%, #451a03 50%, #7c2d12 100%)", accent: "#f59e0b" },
+        ing: { name: "Bahasa Inggris", teacher: "Mr. John", theme: "linear-gradient(135deg, #082f49 0%, #0c4a6e 50%, #134e4a 100%)", accent: "#06b6d4" },
+        ipa: { name: "IPA", teacher: "Pak Hendra", theme: "linear-gradient(135deg, #022c22 0%, #064e3b 50%, #14532d 100%)", accent: "#10b981" },
+        ips: { name: "IPS", teacher: "Bu Siska", theme: "linear-gradient(135deg, #431407 0%, #7c2d12 50%, #365314 100%)", accent: "#f97316" },
+        agama: { name: "Agama Islam", teacher: "Pak Ahmad", theme: "linear-gradient(135deg, #064e3b 0%, #022c22 50%, #1e3a8a 100%)", accent: "#10b981" },
+        infor: { name: "Informatika", teacher: "Pak Kevin", theme: "linear-gradient(135deg, #1e1b4b 0%, #311042 50%, #0f172a 100%)", accent: "#6366f1" },
+        pkn: { name: "PPKn", teacher: "Bu Ratna", theme: "linear-gradient(135deg, #450a0a 0%, #7f1d1d 50%, #1c1917 100%)", accent: "#ef4444" },
+        seni: { name: "Seni Budaya", teacher: "Pak Doni", theme: "linear-gradient(135deg, #4c0519 0%, #701a75 50%, #311042 100%)", accent: "#ec4899" }
+    };
+
+    // DATABASE 99 SOAL LENGKAP TIAP PELAJARAN
+    const masterDatabase = {
+        pu: [
+            { q: "Apa ibu kota negara Indonesia?", a: ["jakarta", "dki jakarta"] },
+            { q: "Siapa nama Presiden Indonesia pertama?", a: ["soekarno", "ir soekarno"] },
+            { q: "Planet terdekat dari Matahari adalah...", a: ["merkurius"] },
+            { q: "Bahan utama pembuat tempe adalah...", a: ["kedelai", "kacang kedelai"] },
+            { q: "Mata uang negara Jepang adalah...", a: ["yen"] },
+            { q: "Benua terbesar di dunia adalah...", a: ["asia"] },
+            { q: "Hewan tercepat di darat adalah...", a: ["cheetah"] },
+            { q: "Lagu kebangsaan Indonesia adalah...", a: ["indonesia raya"] },
+            { q: "Candi Borobudur dibangun oleh dinasti...", a: ["syailendra"] },
+            { q: "Penemu bola lampu pijar adalah...", a: ["thomas alva edison", "edison"] },
+            { q: "Laut yang sangat luas dinamakan...", a: ["samudra"] },
+            { q: "Burung yang menjadi lambang negara Indonesia adalah...", a: ["garuda"] },
+            { q: "Gunung tertinggi di Indonesia adalah...", a: ["puncak jaya", "jayawijaya"] },
+            { q: "Monumen Nasional (Monas) terletak di kota...", a: ["jakarta"] },
+            { q: "Alat untuk mengukur suhu tubuh adalah...", a: ["termometer"] },
+            { q: "Samudra terbesar di dunia adalah...", a: ["pasifik"] },
+            { q: "Senjata tradisional khas Jawa Barat adalah...", a: ["kujang"] },
+            { q: "Lagu daerah 'Anju Ahu' berasal dari provinsi...", a: ["sumatera utara"] },
+            { q: "Ibu kota negara Inggris adalah...", a: ["london"] },
+            { q: "Penemu telepon adalah...", a: ["alexander graham bell", "graham bell"] },
+            { q: "Stasiun luar angkasa internasional disingkat menjadi...", a: ["iss"] },
+            { q: "Negara kincir angin adalah julukan untuk negara...", a: ["belanda"] },
+            { q: "Organisasi kesehatan dunia di bawah PBB disingkat...", a: ["who"] },
+            { q: "Ibu kota Australia adalah...", a: ["canberra"] },
+            { q: "Tarian khas daerah Bali yang terkenal dinamakan tari...", a: ["kecak"] },
+            { q: "Mata uang resmi Singapura adalah...", a: ["dolar singapura", "dollar singapura"] },
+            { q: "Kanal buatan yang menghubungkan Laut Merah dan Laut Tengah dinamakan...", a: ["terusan suez"] },
+            { q: "Siapa penemu mesin uap?", a: ["james watt"] },
+            { q: "Penulis naskah Proklamasi Indonesia bersama Soekarno dan Hatta adalah...", a: ["ahmad soebardjo"] },
+            { q: "Lagu daerah 'Yamko Rambe Yamko' berasal dari daerah...", a: ["papua"] },
+            { q: "Benua tertua di dunia sering dirujuk pada benua...", a: ["afrika"] },
+            { q: "Kota dinamakan Kota Pahlawan di Indonesia adalah...", a: ["surabaya"] },
+            { q: "Peristiwa Sumpah Pemuda terjadi pada tanggal...", a: ["28 oktober 1928", "28 oktober"] },
+            { q: "Sungai terpanjang di dunia adalah sungai...", a: ["nil"] },
+            { q: "Hewan mamalia terbesar di dunia adalah...", a: ["paus biru"] },
+            { q: "Pusat pemerintahan Amerika Serikat berada di kota...", a: ["washington dc"] },
+            { q: "Pengibaran bendera pusaka pertama kali dilakukan oleh Latief Hendraningrat dan...", a: ["suhud"] },
+            { q: "Seni beladiri asli dari Indonesia dinamakan...", a: ["pencak silat"] },
+            { q: "Ibu kota negara Thailand adalah...", a: ["bangkok"] },
+            { q: "Negara tirai bambu adalah julukan untuk negara...", a: ["china", "cina", "tiongkok"] },
+            { q: "Alat musik petik khas dari Nusa Tenggara Timur adalah...", a: ["sasando"] },
+            { q: "Kota tempat museum Louvre berada adalah...", a: ["paris"] },
+            { q: "Mata uang negara Korea Selatan adalah...", a: ["won"] },
+            { q: "Sumpah yang diucapkan oleh Gajah Mada dinamakan...", a: ["sumpah palapa"] },
+            { q: "Bangunan keajaiban dunia berupa makam megah di India adalah...", a: ["taj mahal"] },
+            { q: "Lagu daerah 'Gundul Pacul' berasal dari provinsi...", a: ["jawa tengah"] },
+            { q: "Gurun pasir terbesar di dunia adalah gurun...", a: ["sahara"] },
+            { q: "Julukan bagi kota Bandung adalah kota...", a: ["kembang"] },
+            { q: "Bunga nasional Indonesia yang dijuluki Puspa Bangsa adalah...", a: ["melati"] },
+            { q: "Tengku Amir Hamzah adalah seorang penyair terkenal dari angkatan...", a: ["pujangga baru"] },
+            { q: "Rumah adat suku Toraja dinamakan...", a: ["tongkonan"] },
+            { q: "Danau terbesar di Indonesia adalah danau...", a: ["toba"] },
+            { q: "Bulan dengan jumlah hari paling sedikit dalam penanggalan masehi adalah...", a: ["februari"] },
+            { q: "Lagu daerah 'Ampar Ampar Pisang' berasal dari...", a: ["kalimantan selatan"] },
+            { q: "Selat yang memisahkan Pulau Jawa dan Pulau Sumatra adalah selat...", a: ["sunda"] },
+            { q: "Alat musik tiup tradisional yang berasal dari bambu dinamakan...", a: ["suling"] },
+            { q: "Pencipta lagu Indonesia Raya adalah...", a: ["wr supratman", "wage rudolf supratman"] },
+            { q: "Ibu kota provinsi Jawa Timur adalah...", a: ["surabaya"] },
+            { q: "Candi Hindu terbesar di Indonesia adalah Candi...", a: ["prambanan"] },
+            { q: "Tenggara adalah arah mata angin di antara timur dan...", a: ["selatan"] },
+            { q: "Kerajaan Islam pertama di pulau Jawa adalah kerajaan...", a: ["demak"] },
+            { q: "Kain tradisional khas Batak dinamakan kain...", a: ["ulos"] },
+            { q: "Patung Merlion menjadi ikon khas dari negara...", a: ["singapura"] },
+            { q: "Pusat peradaban Inca kuno berada di negara...", a: ["peru"] },
+            { q: "Kota tempat diselenggarakannya KTT Asia Afrika pertama pada tahun 1955 adalah...", a: ["bandung"] },
+            { q: "Alat transportasi tradisional yang ditarik oleh kuda dinamakan...", a: ["delman", "andong"] },
+            { q: "Pulau terluas di Indonesia adalah pulau...", a: ["kalimantan"] },
+            { q: "Tokoh pejuang wanita dari Jawa Tengah yang memperjuangkan hak wanita adalah...", a: ["kartini", "ra kartini"] },
+            { q: "Senjata tradisional khas dari Aceh dinamakan...", a: ["rencong"] },
+            { q: "Kerajaan Hindu tertua di Indonesia adalah kerajaan...", a: ["kutai"] },
+            { q: "Ibu kota negara Malaysia adalah...", a: ["kuala lumpur"] },
+            { q: "Mata uang Euro digunakan secara luas di benua...", a: ["eropa"] },
+            { q: "Peristiwa pendaratan manusia pertama di bulan dijalankan oleh misi bernama Apollo...", a: ["11"] },
+            { q: "Taman Nasional tempat habitat komodo berada di provinsi...", a: ["nusa tenggara timur", "ntt"] },
+            { q: "Penemu radio adalah...", a: ["guglielmo marconi", "marconi"] },
+            { q: "Julukan bagi negara Jepang adalah negara...", a: ["matahari terbit"] },
+            { q: "Simbol kimia untuk emas adalah...", a: ["au"] },
+            { q: "Kaktus menyimpan cadangan air terutama di bagian...", a: ["batang"] },
+            { q: "Rumah adat khas Papua dinamakan...", a: ["honai"] },
+            { q: "Gunung tertinggi di dunia adalah Gunung...", a: ["everest"] },
+            { q: "Pusat organisasi PBB berlokasi di kota...", a: ["new york"] },
+            { q: "Hari Lahir Pancasila diperingati setiap tanggal...", a: ["1 juni"] },
+            { q: "Tokoh pendiri gerakan Pramuka dunia adalah...", a: ["baden powell"] },
+            { q: "Grup musik legendaris asal Liverpool, Inggris adalah The...", a: ["beatles"] },
+            { q: "Siapa penemu dinamit yang namanya diabadikan untuk penghargaan dunia?", a: ["alfred nobel"] },
+            { q: "Ibu kota negara Italia adalah...", a: ["roma"] },
+            { q: "Lagu 'Soleram' adalah lagu daerah yang berasal dari...", a: ["riau"] },
+            { q: "Nama kapal yang digunakan oleh Christopher Columbus saat menemukan Benua Amerika adalah Santa...", a: ["maria"] },
+            { q: "Ibu kota provinsi Sulawesi Selatan adalah...", a: ["makassar"] },
+            { q: "Senjata tradisional masyarakat Madura dinamakan...", a: ["celurit"] },
+            { q: "Seni melipat kertas khas Jepang dinamakan...", a: ["origami"] },
+            { q: "Selat yang memisahkan Pulau Sumatera dan Malaysia adalah Selat...", a: ["malaka"] },
+            { q: "Penemu hukum gravitasi adalah Sir Isaac...", a: ["newton"] },
+            { q: "Ibu kota negara Mesir adalah...", a: ["kairo"] },
+            { q: "Kota tempat Ka'bah berada adalah kota...", a: ["mekkah"] },
+            { q: "Pulau yang dikenal dengan nama 'Pariwisata Dewata' di Indonesia adalah...", a: ["bali"] },
+            { q: "Ibu kota negara Rusia adalah...", a: ["moskow"] },
+            { q: "Berapa jumlah provinsi di Indonesia saat ini?", a: ["38", "tiga puluh delapan"] }
+        ],
+
+        mtk: [
+            { q: "Berapa hasil dari 15 + 27?", a: ["42"] },
+            { q: "Berapa hasil dari 100 - 43?", a: ["57"] },
+            { q: "Berapa hasil perkalian 8 x 9?", a: ["72"] },
+            { q: "Berapa kuadrat dari 12 (12²)?", a: ["144"] },
+            { q: "Berapa akar pangkat dua dari 81?", a: ["9"] },
+            { q: "Berapa hasil dari 50 / 2?", a: ["25"] },
+            { q: "Berapa hasil dari 7 x 6?", a: ["42"] },
+            { q: "Berapa hasil dari 125 + 75?", a: ["200"] },
+            { q: "Berapa hasil dari 90 - 35?", a: ["55"] },
+            { q: "Berapa kuadrat dari 15 (15²)?", a: ["225"] },
+            { q: "Berapa hasil dari 12 x 12?", a: ["144"] },
+            { q: "Berapa akar pangkat dua dari 100?", a: ["10"] },
+            { q: "Berapa hasil dari 144 / 12?", a: ["12"] },
+            { q: "Berapa hasil dari 18 + 32?", a: ["50"] },
+            { q: "Berapa hasil dari 80 - 24?", a: ["56"] },
+            { q: "Berapa hasil dari 9 x 9?", a: ["81"] },
+            { q: "Berapa kuadrat dari 20 (20²)?", a: ["400"] },
+            { q: "Berapa akar pangkat dua dari 169?", a: ["13"] },
+            { q: "Berapa hasil dari 250 / 5?", a: ["50"] },
+            { q: "Berapa hasil dari 33 + 67?", a: ["100"] },
+            { q: "Berapa hasil dari 150 - 85?", a: ["65"] },
+            { q: "Berapa hasil dari 11 x 11?", a: ["121"] },
+            { q: "Berapa kuadrat dari 8 (8²)?", a: ["64"] },
+            { q: "Berapa akar pangkat dua dari 225?", a: ["15"] },
+            { q: "Berapa hasil dari 300 / 6?", a: ["50"] },
+            { q: "Berapa hasil dari 45 + 55?", a: ["100"] },
+            { q: "Berapa hasil dari 200 - 111?", a: ["89"] },
+            { q: "Berapa hasil dari 13 x 4?", a: ["52"] },
+            { q: "Berapa kuadrat dari 25 (25²)?", a: ["625"] },
+            { q: "Berapa akar pangkat dua dari 400?", a: ["20"] },
+            { q: "Berapa hasil dari 180 / 9?", a: ["20"] },
+            { q: "Berapa hasil dari 64 + 36?", a: ["100"] },
+            { q: "Berapa hasil dari 75 - 28?", a: ["47"] },
+            { q: "Berapa hasil dari 15 x 5?", a: ["75"] },
+            { q: "Berapa kuadrat dari 7 (7²)?", a: ["49"] },
+            { q: "Berapa akar pangkat dua dari 64?", a: ["8"] },
+            { q: "Berapa hasil dari 96 / 8?", a: ["12"] },
+            { q: "Berapa hasil dari 88 + 22?", a: ["110"] },
+            { q: "Berapa hasil dari 500 - 235?", a: ["265"] },
+            { q: "Berapa hasil dari 16 x 3?", a: ["48"] },
+            { q: "Berapa kuadrat dari 9 (9²)?", a: ["81"] },
+            { q: "Berapa akar pangkat dua dari 144?", a: ["12"] },
+            { q: "Berapa hasil dari 210 / 7?", a: ["30"] },
+            { q: "Berapa hasil dari 57 + 43?", a: ["100"] },
+            { q: "Berapa hasil dari 100 - 68?", a: ["32"] },
+            { q: "Berapa hasil dari 14 x 5?", a: ["70"] },
+            { q: "Berapa kuadrat dari 11 (11²)?", a: ["121"] },
+            { q: "Berapa akar pangkat dua dari 49?", a: ["7"] },
+            { q: "Berapa hasil dari 360 / 6?", a: ["60"] },
+            { q: "Berapa hasil dari 123 + 77?", a: ["200"] },
+            { q: "Berapa hasil dari 400 - 150?", a: ["250"] },
+            { q: "Berapa hasil dari 25 x 4?", a: ["100"] },
+            { q: "Berapa kuadrat dari 30 (30²)?", a: ["900"] },
+            { q: "Berapa akar pangkat dua dari 256?", a: ["16"] },
+            { q: "Berapa hasil dari 500 / 10?", a: ["50"] },
+            { q: "Berapa hasil dari 215 + 85?", a: ["300"] },
+            { q: "Berapa hasil dari 320 - 140?", a: ["180"] },
+            { q: "Berapa hasil dari 18 x 2?", a: ["36"] },
+            { q: "Berapa kuadrat dari 13 (13²)?", a: ["169"] },
+            { q: "Berapa akar pangkat dua dari 36?", a: ["6"] },
+            { q: "Berapa hasil dari 150 / 3?", a: ["50"] },
+            { q: "Berapa hasil dari 89 + 11?", a: ["100"] },
+            { q: "Berapa hasil dari 250 - 95?", a: ["155"] },
+            { q: "Berapa hasil dari 17 x 3?", a: ["51"] },
+            { q: "Berapa kuadrat dari 14 (14²)?", a: ["196"] },
+            { q: "Berapa akar pangkat dua dari 289?", a: ["17"] },
+            { q: "Berapa hasil dari 480 / 8?", a: ["60"] },
+            { q: "Berapa hasil dari 142 + 58?", a: ["200"] },
+            { q: "Berapa hasil dari 600 - 250?", a: ["350"] },
+            { q: "Berapa hasil dari 22 x 4?", a: ["88"] },
+            { q: "Berapa kuadrat dari 6 (6²)?", a: ["36"] },
+            { q: "Berapa akar pangkat dua dari 324?", a: ["18"] },
+            { q: "Berapa hasil dari 630 / 9?", a: ["70"] },
+            { q: "Berapa hasil dari 305 + 95?", a: ["400"] },
+            { q: "Berapa hasil dari 1000 - 450?", a: ["550"] },
+            { q: "Berapa hasil dari 30 x 3?", a: ["90"] },
+            { q: "Berapa kuadrat dari 16 (16²)?", a: ["256"] },
+            { q: "Berapa akar pangkat dua dari 361?", a: ["19"] },
+            { q: "Berapa hasil dari 720 / 8?", a: ["90"] },
+            { q: "Berapa hasil dari 512 + 88?", a: ["600"] },
+            { q: "Berapa hasil dari 850 - 320?", a: ["530"] },
+            { q: "Berapa hasil dari 12 x 8?", a: ["96"] },
+            { q: "Berapa kuadrat dari 17 (17²)?", a: ["289"] },
+            { q: "Berapa akar pangkat dua dari 625?", a: ["25"] },
+            { q: "Berapa hasil dari 810 / 9?", a: ["90"] },
+            { q: "Berapa hasil dari 650 + 350?", a: ["1000"] },
+            { q: "Berapa hasil dari 750 - 280?", a: ["470"] },
+            { q: "Berapa hasil dari 15 x 6?", a: ["90"] },
+            { q: "Berapa kuadrat dari 18 (18²)?", a: ["324"] },
+            { q: "Berapa akar pangkat dua dari 900?", a: ["30"] },
+            { q: "Berapa hasil dari 1000 / 25?", a: ["40"] },
+            { q: "Berapa hasil dari 432 + 168?", a: ["600"] },
+            { q: "Berapa hasil dari 900 - 425?", a: ["475"] },
+            { q: "Berapa hasil dari 16 x 5?", a: ["80"] },
+            { q: "Berapa kuadrat dari 19 (19²)?", a: ["361"] },
+            { q: "Berapa akar pangkat dua dari 10000?", a: ["100"] },
+            { q: "Berapa hasil dari 1200 / 12?", a: ["100"] },
+            { q: "Berapa hasil dari 888 + 112?", a: ["1000"] },
+            { q: "Berapa hasil dari 1500 - 650?", a: ["850"] }
+        ],
+
+        ing: [
+            { q: "Apakah Bahasa Inggris dari kata 'Buku'?", a: ["book"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Kucing'?", a: ["cat"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Anjing'?", a: ["dog"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Rumah'?", a: ["house"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Apel'?", a: ["apple"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Pintu'?", a: ["door"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Air'?", a: ["water"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Matahari'?", a: ["sun"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Bintang'?", a: ["star"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Sekolah'?", a: ["school"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Guru'?", a: ["teacher"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Siswa'?", a: ["student"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Pena'?", a: ["pen"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Meja'?", a: ["table"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Kursi'?", a: ["chair"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Mobil'?", a: ["car"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Pohon'?", a: ["tree"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Bunga'?", a: ["flower"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Uang'?", a: ["money"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Makanan'?", a: ["food"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Susu'?", a: ["milk"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Ikan'?", a: ["fish"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Burung'?", a: ["bird"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Ular'?", a: ["snake"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Bulan'?", a: ["moon"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Hujan'?", a: ["rain"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Angin'?", a: ["wind"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Awan'?", a: ["cloud"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Sepatu'?", a: ["shoe", "shoes"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Baju'?", a: ["shirt", "clothes"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Celana'?", a: ["pants", "trousers"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Mata'?", a: ["eye", "eyes"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Hidung'?", a: ["nose"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Telinga'?", a: ["ear", "ears"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Tangan'?", a: ["hand", "hands"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Kaki'?", a: ["foot", "leg"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Kepala'?", a: ["head"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Rambut'?", a: ["hair"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Gigi'?", a: ["tooth", "teeth"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Mulut'?", a: ["mouth"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Ibu'?", a: ["mother", "mom"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Ayah'?", a: ["father", "dad"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Kakak laki-laki'?", a: ["brother"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Kakak perempuan'?", a: ["sister"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Kakek'?", a: ["grandfather", "grandpa"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Nenek'?", a: ["grandmother", "grandma"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Paman'?", a: ["uncle"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Bibi'?", a: ["aunt"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Teman'?", a: ["friend"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Waktu'?", a: ["time"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Hari'?", a: ["day"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Malam'?", a: ["night"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Pagi'?", a: ["morning"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Siang'?", a: ["afternoon", "day"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Tahun'?", a: ["year"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Minggu'?", a: ["week"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Kota'?", a: ["city"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Desa'?", a: ["village"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Jalan'?", a: ["street", "road"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Sungai'?", a: ["river"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Laut'?", a: ["sea", "ocean"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Gunung'?", a: ["mountain"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Danau'?", a: ["lake"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Hutan'?", a: ["forest", "jungle"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Api'?", a: ["fire"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Es'?", a: ["ice"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Salju'?", a: ["snow"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Merah'?", a: ["red"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Biru'?", a: ["blue"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Kuning'?", a: ["yellow"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Hijau'?", a: ["green"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Hitam'?", a: ["black"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Putih'?", a: ["white"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Ungu'?", a: ["purple"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Cokelat'?", a: ["brown"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Besar'?", a: ["big"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Kecil'?", a: ["small"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Tinggi'?", a: ["tall", "high"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Pendek'?", a: ["short"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Cepat'?", a: ["fast", "quick"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Lambat'?", a: ["slow"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Panas'?", a: ["hot"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Dingin'?", a: ["cold"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Senang'?", a: ["happy"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Sedih'?", a: ["sad"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Marah'?", a: ["angry"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Takut'?", a: ["scared", "afraid"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Makan'?", a: ["eat"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Minum'?", a: ["drink"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Tidur'?", a: ["sleep"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Lari'?", a: ["run"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Jalan'?", a: ["walk"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Membaca'?", a: ["read"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Menulis'?", a: ["write"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Melihat'?", a: ["see", "look"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Mendengar'?", a: ["hear", "listen"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Bicara'?", a: ["speak", "talk"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Cinta'?", a: ["love"] },
+            { q: "Apakah Bahasa Inggris dari kata 'Dunia'?", a: ["world"] }
+        ],
+
+        ipa: [
+            { q: "Proses tumbuhan hijau membuat makanan sendiri dinamakan...", a: ["fotosintesis"] },
+            { q: "Alat pernapasan utama pada ikan adalah...", a: ["insang"] },
+            { q: "Zat hijau daun pada tumbuhan dinamakan...", a: ["klorofil"] },
+            { q: "Planet terbesar di tata surya kita adalah...", a: ["jupiter", "yupiter"] },
+            { q: "Gaya yang menarik semua benda ke pusat bumi adalah gaya...", a: ["gravitasi"] },
+            { q: "Perubahan wujud dari padat menjadi gas dinamakan...", a: ["menyublim"] },
+            { q: "Hewan pemakan daging disebut...", a: ["karnivora"] },
+            { q: "Hewan pemakan tumbuhan disebut...", a: ["herbivora"] },
+            { q: "Organ tubuh manusia yang berfungsi memompa darah adalah...", a: ["jantung"] },
+            { q: "Sumber energi utama bagi kehidupan di bumi adalah...", a: ["matahari"] },
+            { q: "Perubahan wujud zat cair menjadi gas dinamakan...", a: ["menguap"] },
+            { q: "Alat pernapasan pada manusia adalah...", a: ["paru-paru", "paru paru"] },
+            { q: "Proses pengikisan tanah oleh air atau angin dinamakan...", a: ["erosi"] },
+            { q: "Gas yang dihirup manusia saat bernapas adalah...", a: ["oksigen"] },
+            { q: "Gas yang dikeluarkan manusia saat menghembuskan napas adalah...", a: ["karbondioksida", "karbon dioksida"] },
+            { q: "Hewan pemakan segala (daging dan tumbuhan) dinamakan...", a: ["omnivora"] },
+            { q: "Perubahan wujud gas menjadi cair dinamakan...", a: ["mengembun"] },
+            { q: "Perubahan wujud cair menjadi padat dinamakan...", a: ["membeku"] },
+            { q: "Perubahan wujud padat menjadi cair dinamakan...", a: ["mencair", "meleleh"] },
+            { q: "Tulang yang melindungi otak manusia dinamakan tulang...", a: ["tengkorak"] },
+            { q: "Bagian sel tumbuhan yang berfungsi memberi bentuk kaku adalah dinding...", a: ["sel"] },
+            { q: "Proses perkembangbiakan tumbuhan secara kawin dinamakan perkembangbiakan...", a: ["generatif"] },
+            { q: "Tahap perubahan bentuk tubuh hewan sepanjang hidupnya dinamakan...", a: ["metamorfosis"] },
+            { q: "Hewan yang berkembang biak dengan bertelur disebut...", a: ["ovipar"] },
+            { q: "Hewan yang berkembang biak dengan melahirkan disebut...", a: ["vivipar"] },
+            { q: "Hewan bertelur dan melahirkan dinamakan...", a: ["ovovivipar"] },
+            { q: "Persatuan dua sel kelamin (jantan dan betina) dinamakan...", a: ["pembuahan", "fertilisasi"] },
+            { q: "Hubungan saling menguntungkan antara dua makhluk hidup dinamakan simbiose...", a: ["mutualisme"] },
+            { q: "Hubungan di mana satu pihak untung dan pihak lain dirugikan dinamakan simbiose...", a: ["parasitisme"] },
+            { q: "Cermin yang memiliki permukaan melengkung ke luar dinamakan cermin...", a: ["cembung"] },
+            { q: "Cermin yang memiliki permukaan melengkung ke dalam dinamakan cermin...", a: ["cekung"] },
+            { q: "Satuan Internasional untuk daya listrik adalah...", a: ["watt"] },
+            { q: "Satuan Internasional untuk kuat arus listrik adalah...", a: ["ampere"] },
+            { q: "Organ pencernaan tempat penyerapan sari-sari makanan adalah usus...", a: ["halus"] },
+            { q: "Benda yang dapat menghantarkan panas/listrik dengan baik dinamakan...", a: ["konduktor"] },
+            { q: "Benda yang sulit menghantarkan panas/listrik dinamakan...", a: ["isolator"] },
+            { q: "Bagian mata yang mengatur jumlah cahaya yang masuk adalah...", a: ["pupil"] },
+            { q: "Bagian mata yang memberi warna pada mata dinamakan...", a: ["iris"] },
+            { q: "Lapisan pelindung bumi dari radiasi sinar ultraviolet matahari adalah lapisan...", a: ["ozon"] },
+            { q: "Alat untuk mengukur tekanan udara dinamakan...", a: ["barometer"] },
+            { q: "Alat untuk mengukur kelembapan udara dinamakan...", a: ["higrometer"] },
+            { q: "Kumpulan dari beberapa rantai makanan dinamakan jaring-jaring...", a: ["makanan"] },
+            { q: "Makhluk hidup yang berperan menguraikan zat organik dinamakan...", a: ["pengurai", "dekomposer"] },
+            { q: "Peristiwa berputarnya bumi pada porosnya dinamakan...", a: ["rotasi"] },
+            { q: "Peristiwa beredarnya bumi mengelilingi matahari dinamakan...", a: ["revolusi"] },
+            { q: "Waktu yang dibutuhkan bumi untuk satu kali rotasi adalah...", a: ["24 jam", "1 hari"] },
+            { q: "Satelit alami yang dimiliki oleh Planet Bumi adalah...", a: ["bulan"] },
+            { q: "Planet yang dikenal sebagai Planet Merah adalah...", a: ["mars"] },
+            { q: "Planet yang memiliki cincin paling indah dan menonjol adalah...", a: ["saturnus"] },
+            { q: "Bunyi dengan frekuensi di atas 20.000 Hz dinamakan bunyi...", a: ["ultrasonic", "ultrasonik"] },
+            { q: "Bunyi dengan frekuensi di bawah 20 Hz dinamakan bunyi...", a: ["infrasonic", "infrasonik"] },
+            { q: "Perpindahan panas melalui zat perantara tanpa disertai perpindahan partikel dinamakan...", a: ["konduksi"] },
+            { q: "Perpindahan panas yang disertai aliran partikel zat perantaranya dinamakan...", a: ["konveksi"] },
+            { q: "Perpindahan panas secara langsung tanpa zat perantara dinamakan...", a: ["radiasi"] },
+            { q: "Penyakit akibat kekurangan sel darah merah dinamakan...", a: ["anemia"] },
+            { q: "Penyakit tekanan darah tinggi dinamakan...", a: ["hipertensi"] },
+            { q: "Zat pewarna merah pada darah manusia dinamakan...", a: ["hemoglobin"] },
+            { q: "Pembuluh darah yang mengalirkan darah keluar dari jantung dinamakan pembuluh...", a: ["nadi", "arteri"] },
+            { q: "Pembuluh darah yang mengalirkan darah menuju ke jantung dinamakan pembuluh...", a: ["balik", "vena"] },
+            { q: "Proses pembersihan darah dari kotoran terjadi di organ...", a: ["ginjal"] },
+            { q: "Organ utama penawar racun dalam tubuh manusia adalah...", a: ["hati"] },
+            { q: "Lambung menghasilkan asam untuk membunuh kuman, yaitu asam...", a: ["klorida"] },
+            { q: "Enzim ptyalin berfungsi mengubah amilum menjadi gula, terdapat di...", a: ["air liur", "mulut"] },
+            { q: "Pertukaran gas oksigen dan karbondioksida di dalam paru-paru terjadi pada...", a: ["alveolus"] },
+            { q: "Sendi yang memungkinkan gerakan ke segala arah dinamakan sendi...", a: ["peluru"] },
+            { q: "Sendi yang memfasilitasi gerakan satu arah seperti engsel pintu dinamakan sendi...", a: ["engsel"] },
+            { q: "Sendi pada leher yang memungkinkan gerakan memutar dinamakan sendi...", a: ["putar"] },
+            { q: "Tumbuhan yang menyesuaikan diri di lingkungan kering dinamakan tumbuhan...", a: ["xerofit"] },
+            { q: "Tumbuhan yang hidup dan menyesuaikan diri di air dinamakan tumbuhan...", a: ["hidrofit"] },
+            { q: "Kemampuan hewan menyesuaikan warna tubuh dengan lingkungan sekitar dinamakan...", a: ["mimikri"] },
+            { q: "Kemampuan cicak memutuskan ekornya untuk mengelabuhi musuh dinamakan...", a: ["autotomi"] },
+            { q: "Gelombang pancaran bunyi untuk mengukur kedalaman laut dinamakan...", a: ["sonar"] },
+            { q: "Hewan nocturnal adalah hewan yang aktif pada...", a: ["malam hari"] },
+            { q: "Kemampuan kelelawar menggunakan bunyi untuk mendeteksi benda dinamakan...", a: ["ekolokasi"] },
+            { q: "Zat gizi yang berfungsi sebagai sumber energi utama adalah...", a: ["karbohidrat"] },
+            { q: "Zat gizi yang berfungsi sebagai zat pembangun tubuh adalah...", a: ["protein"] },
+            { q: "Penyakit kekurangan vitamin C dinamakan...", a: ["sariawan", "skorbut"] },
+            { q: "Penyakit tulang rapuh akibat kekurangan kalsium dinamakan...", a: ["osteoporosis"] },
+            { q: "Batu kapur tergolong ke dalam jenis batuan...", a: ["sedimen"] },
+            { q: "Batuan yang terbentuk dari pendinginan magma dinamakan batuan...", a: ["beku"] },
+            { q: "Magnet yang terbentuk secara alami dinamakan magnet...", a: ["alam"] },
+            { q: "Kutub magnet yang senama jika didekatkan akan saling...", a: ["tolak menolak", "menolak"] },
+            { q: "Kutub magnet yang tidak senama jika didekatkan akan saling...", a: ["tarik menarik", "menarik"] },
+            { q: "Kutub magnet selalu menunjuk ke arah utara dan...", a: ["selatan"] },
+            { q: "Gaya tarik menarik bumi terhadap semua benda dinamakan gaya...", a: ["gravitasi"] },
+            { q: "Satuan dari gaya adalah...", a: ["newton"] },
+            { q: "Bagian sel yang berfungsi mengatur seluruh kegiatan sel dinamakan inti sel atau...", a: ["nukleus"] },
+            { q: "Alat untuk melihat benda-benda renik (sangat kecil) dinamakan...", a: ["mikroskop"] },
+            { q: "Alat untuk melihat benda-benda langit yang sangat jauh dinamakan...", a: ["teleskop"] },
+            { q: "Tumbuhan bernapas mengambil oksigen melalui pori-pori daun yang disebut...", a: ["stomata"] },
+            { q: "Proses penguapan air pada tumbuhan dinamakan...", a: ["transpirasi"] },
+            { q: "Proses pengendapan titik-titik air menjadi hujan dinamakan...", a: ["presipitasi"] },
+            { q: "Daur air diawali dengan penguapan air laut/sungai yang dinamakan...", a: ["evaporasi"] },
+            { q: "Proses penguapan dari tumbuhan dinamakan...", a: ["transpirasi"] },
+            { q: "Gas rumah kaca utama yang memicu pemanasan global adalah...", a: ["karbondioksida"] },
+            { q: "Lensa pada mata yang memfokuskan bayangan dinamakan lensa...", a: ["mata"] },
+            { q: "Penyakit penderitanya tidak bisa melihat benda jarak jauh dinamakan rabun...", a: ["jauh"] },
+            { q: "Peristiwa pembelokan arah rambat cahaya dinamakan pembiasan atau...", a: ["refraksi"] },
+            { q: "Partikel bermuatan listrik positif di dalam atom dinamakan...", a: ["proton"] }
+        ],
+
+        ips: [
+            { q: "Candi Borobudur terletak di provinsi...", a: ["jawa tengah"] },
+            { q: "Rumah adat khas Minangkabau dinamakan Rumah...", a: ["gadang"] },
+            { q: "Mata uang resmi negara Indonesia adalah...", a: ["rupiah"] },
+            { q: "Organisasi perhimpunan negara-negara di Asia Tenggara adalah...", a: ["asean"] },
+            { q: "Benua terkecil di dunia adalah...", a: ["australia"] },
+            { q: "Tokoh yang membacakan Teks Proklamasi Kemerdekaan Indonesia adalah...", a: ["soekarno", "ir soekarno"] },
+            { q: "Samudra terluas di dunia adalah Samudra...", a: ["pasifik"] },
+            { q: "Kerajaan Hindu tertua di Indonesia adalah...", a: ["kutai"] },
+            { q: "Pendiri Kerajaan Majapahit adalah...", a: ["raden wijaya"] },
+            { q: "Pusat Kerajaan Sriwijaya diperkirakan berada di daerah...", a: ["palembang"] },
+            { q: "Patih terkenal dari Kerajaan Majapahit adalah Gajah...", a: ["mada"] },
+            { q: "Sumpah terkenal yang diucapkan Gajah Mada adalah Sumpah...", a: ["palapa"] },
+            { q: "Bangsa Eropa pertama yang mendarat di Maluku untuk mencari rempah adalah...", a: ["portugis"] },
+            { q: "Organisasi dagang milik Belanda di Indonesia disingkat...", a: ["voc"] },
+            { q: "Sistem kerja paksa pada masa penjajahan Belanda dinamakan...", a: ["kerja rodi", "rodi"] },
+            { q: "Sistem tanam paksa pada masa penjajahan Belanda disebut...", a: ["cultuurstelsel"] },
+            { q: "Tokoh yang memimpin Perang Diponegoro adalah Pangeran...", a: ["diponegoro"] },
+            { q: "Pahlawan nasional dari Maluku yang memimpin perlawanan terhadap Belanda adalah Pattimura atau Thomas...", a: ["matulessy"] },
+            { q: "Pahlawan nasional wanita dari Aceh yang gigih melawan Belanda adalah Cut Nyak...", a: ["dien"] },
+            { q: "Peristiwa penculikan Soekarno dan Hatta sebelum proklamasi dinamakan peristiwa Rengasdengklok...", a: ["rengasdengklok"] },
+            { q: "Teks Proklamasi diketik oleh...", a: ["sayuti melik"] },
+            { q: "Pengibar bendera Sang Saka Merah Putih saat Proklamasi adalah Latief Hendraningrat dan...", a: ["suhud"] },
+            { q: "Penjahit bendera pusaka Sang Saka Merah Putih adalah Ibu...", a: ["fatmawati"] },
+            { q: "Wakil Presiden Indonesia yang pertama adalah Mohammad...", a: ["hatta"] },
+            { q: "Hari Kemerdekaan Indonesia diperingati setiap tanggal...", a: ["17 agustus"] },
+            { q: "Organisasi PBB berdiri pada tahun 1945, berpusat di kota...", a: ["new york"] },
+            { q: "Negara tetangga Indonesia yang berbatasan darat langsung di pulau Kalimantan adalah...", a: ["malaysia"] },
+            { q: "Negara tetangga Indonesia di timur Pulau Papua adalah Papua...", a: ["nugini"] },
+            { q: "Garis khayal yang membagi bumi menjadi dua bagian utara dan selatan dinamakan garis...", a: ["katulistiwa", "equator"] },
+            { q: "Indonesia memiliki iklim...", a: ["tropis"] },
+            { q: "Indonesia memiliki dua musim, yaitu musim kemarau dan musim...", a: ["hujan"] },
+            { q: "Angin yang berembus dari benua Asia ke benua Australia membawa musim hujan di Indonesia adalah angin muson...", a: ["barat"] },
+            { q: "Keadaan rata-rata udara pada tempat yang luas dan waktu yang lama dinamakan...", a: ["iklim"] },
+            { q: "Keadaan udara pada suatu tempat tertentu dan waktu yang singkat dinamakan...", a: ["cuaca"] },
+            { q: "Alat untuk menunjukkan arah mata angin dinamakan...", a: ["kompas"] },
+            { q: "Peta buatan dalam bentuk bola dunia yang menyerupai bentuk bumi dinamakan...", a: ["globe"] },
+            { q: "Kumpulan peta yang dibukukan dinamakan...", a: ["atlas"] },
+            { q: "Per perbandingan jarak pada peta dengan jarak sebenarnya di lapangan dinamakan...", a: ["skala"] },
+            { q: "Simbol warna biru pada peta melambangkan wilayah...", a: ["perairan", "laut"] },
+            { q: "Simbol warna hijau pada peta melambangkan wilayah...", a: ["dataran rendah"] },
+            { q: "Simbol warna cokelat pada peta melambangkan wilayah...", a: ["pegunungan"] },
+            { q: "Suku bangsa asli dari pulau Papua adalah suku...", a: ["asmat"] },
+            { q: "Suku asli yang mendiami pulau Bali dinamakan suku...", a: ["bali"] },
+            { q: "Suku bangsa terbesar di Indonesia adalah suku...", a: ["jawa"] },
+            { q: "Tari Saman berasal dari provinsi...", a: ["aceh"] },
+            { q: "Tari Jaipong berasal dari provinsi...", a: ["jawa barat"] },
+            { q: "Tari Pendet berasal dari provinsi...", a: ["bali"] },
+            { q: "Tari Piring berasal dari provinsi...", a: ["sumatera barat"] },
+            { q: "Tarian perang khas masyarakat Papua dinamakan tari...", a: ["selamat datang"] },
+            { q: "Senjata tradisional keris berasal dari pulau...", a: ["jawa"] },
+            { q: "Alat musik Angklung terbuat dari...", a: ["bambu"] },
+            { q: "Rumah adat Honai merupakan rumah tradisional suku di...", a: ["papua"] },
+            { q: "Rumah adat Gadang berciri khas atap berbentuk tanduk...", a: ["kerbau"] },
+            { q: "Sistem kekeluargaan yang menarik garis keturunan dari pihak ayah dinamakan...", a: ["patrilineal"] },
+            { q: "Sistem kekeluargaan yang menarik garis keturunan dari pihak ibu dinamakan...", a: ["matrilineal"] },
+            { q: "Kegiatan menghasilkan barang dinamakan kegiatan...", a: ["produksi"] },
+            { q: "Kegiatan menyalurkan barang dari produsen ke konsumen dinamakan kegiatan...", a: ["distribusi"] },
+            { q: "Kegiatan menggunakan/menghabiskan nilai guna barang dinamakan kegiatan...", a: ["konsumsi"] },
+            { q: "Orang yang melakukan kegiatan produksi dinamakan...", a: ["produsen"] },
+            { q: "Orang yang melakukan kegiatan distribusi dinamakan...", a: ["distributor"] },
+            { q: "Orang yang melakukan kegiatan konsumsi dinamakan...", a: ["konsumen"] },
+            { q: "Usaha bersama berdasarkan asas kekeluargaan di Indonesia dinamakan...", a: ["koperasi"] },
+            { q: "Bapak Koperasi Indonesia adalah Mohammad...", a: ["hatta"] },
+            { q: "BUMN singkatan dari Badan Usaha Milik...", a: ["negara"] },
+            { q: "BUMD singkatan dari Badan Usaha Milik...", a: ["daerah"] },
+            { q: "Tempat bertemunya penjual dan pembeli dinamakan...", a: ["pasar"] },
+            { q: "Pajak yang dikenakan atas barang mewah dinamakan...", a: ["ppnbm"] },
+            { q: "Ekspor adalah kegiatan menjual barang ke...", a: ["luar negeri"] },
+            { q: "Impor adalah kegiatan membeli barang dari...", a: ["luar negeri"] },
+            { q: "Pelabuhan laut terkenal di Tanjung Priok berada di kota...", a: ["jakarta"] },
+            { q: "Bandara Internasional Soekarno-Hatta berada di provinsi...", a: ["banten"] },
+            { q: "Benua dengan jumlah penduduk terbanyak di dunia adalah...", a: ["asia"] },
+            { q: "Benua terluas di dunia adalah...", a: ["asia"] },
+            { q: "Benua terkecil di dunia adalah...", a: ["australia"] },
+            { q: "Sungai terpanjang di dunia adalah Sungai Nil di benua...", a: ["afrika"] },
+            { q: "Gurun Sahara berada di benua...", a: ["afrika"] },
+            { q: "Negara Jepang terletak di kawasan Asia...", a: ["timur"] },
+            { q: "Negara Indonesia terletak di kawasan Asia...", a: ["tenggara"] },
+            { q: "Negara India terletak di kawasan Asia...", a: ["selatan"] },
+            { q: "Negara Arab Saudi terletak di kawasan Asia...", a: ["barat"] },
+            { q: "Ibu kota negara Inggris adalah...", a: ["london"] },
+            { q: "Ibu kota negara Prancis adalah...", a: ["paris"] },
+            { q: "Ibu kota negara Jerman adalah...", a: ["berlin"] },
+            { q: "Ibu kota negara Amerika Serikat adalah...", a: ["washington dc"] },
+            { q: "Ibu kota negara Jepang adalah...", a: ["tokyo"] },
+            { q: "Terusan yang memisahkan benua Asia dan Afrika adalah Terusan...", a: ["suez"] },
+            { q: "Terusan yang menghubungkan Samudra Pasifik dan Atlantik adalah Terusan...", a: ["panama"] },
+            { q: "Pegunungan tertinggi di dunia adalah Pegunungan...", a: ["himalaya"] },
+            { q: "Puncak tertinggi di benua Asia adalah Gunung...", a: ["everest"] },
+            { q: "Konferensi Asia Afrika (KAA) pertama kali diselenggarakan di kota...", a: ["bandung"] },
+            { q: "Organisasi negara pengeskpor minyak disingkat...", a: ["opec"] },
+            { q: "Lembaga PBB yang mengurusi anak-anak adalah...", a: ["unicef"] },
+            { q: "Lembaga PBB yang mengurusi pendidikan dan kebudayaan adalah...", a: ["unesco"] },
+            { q: "Lembaga PBB yang mengurusi pangan dan pertanian adalah...", a: ["fao"] },
+            { q: "Kerajaan Islam terbesar di Sulawesi Selatan adalah Kerajaan Gowa-...", a: ["tallo"] },
+            { q: "Raja Gowa-Tallo yang dijuluki Ayam Jantan dari Timur adalah Sultan...", a: ["hasanuddin"] },
+            { q: "Pendiri Kerajaan Singasari adalah Ken...", a: ["arok"] },
+            { q: "Raja terkenal dari Kerajaan Kediri yang meramalkan masa depan adalah Jayabaya...", a: ["jayabaya"] }
+        ],
+
+        agama: [
+            { q: "Kitab suci utama umat Islam adalah...", a: ["al quran", "al-quran", "alquran"] },
+            { q: "Rukun Islam yang pertama adalah mengucapkan...", a: ["syahadat", "dua kalimat syahadat"] },
+            { q: "Nabi dan Rasul terakhir dalam ajaran Islam adalah Nabi...", a: ["muhammad", "muhammad saw"] },
+            { q: "Ibadah wajib yang dilakukan di bulan Ramadan adalah...", a: ["puasa"] },
+            { q: "Jumlah rakaat dalam salat Subuh adalah...", a: ["2", "dua"] },
+            { q: "Malaikat yang bertugas menyampaikan wahyu adalah Malaikat...", a: ["jibril"] },
+            { q: "Arah kiblat umat Islam saat melaksanakan salat adalah...", a: ["kabah", "ka'bah"] },
+            { q: "Rukun Iman berjumlah berapa perkara?", a: ["6", "enam"] },
+            { q: "Rukun Islam berjumlah berapa perkara?", a: ["5", "lima"] },
+            { q: "Malaikat pencabut nyawa adalah Malaikat...", a: ["izrail"] },
+            { q: "Malaikat penanya di alam kubur adalah Munkar dan...", a: ["nakir"] },
+            { q: "Malaikat yang mencatat amal baik adalah Malaikat...", a: ["raqib"] },
+            { q: "Malaikat yang mencatat amal buruk adalah Malaikat...", a: ["atid"] },
+            { q: "Malaikat pembagi rezeki adalah Malaikat...", a: ["mikail"] },
+            { q: "Malaikat peniup sangkakala adalah Malaikat...", a: ["israfil"] },
+            { q: "Malaikat penjaga pintu surga adalah Malaikat...", a: ["ridwan"] },
+            { q: "Malaikat penjaga pintu neraka adalah Malaikat...", a: ["malik"] },
+            { q: "Kitab suci yang diturunkan kepada Nabi Musa AS adalah...", a: ["taurat"] },
+            { q: "Kitab suci yang diturunkan kepada Nabi Daud AS adalah...", a: ["zabur"] },
+            { q: "Kitab suci yang diturunkan kepada Nabi Isa AS adalah...", a: ["injil"] },
+            { q: "Nabi pertama yang diciptakan oleh Allah SWT adalah Nabi...", a: ["adam"] },
+            { q: "Nabi yang memiliki mukjizat bisa membuat kapal besar saat banjir bah adalah Nabi...", a: ["nuh"] },
+            { q: "Nabi yang dibakar api namun tidak terbakar adalah Nabi...", a: ["ibrahim"] },
+            { q: "Nabi yang memiliki mukjizat membelah Laut Merah adalah Nabi...", a: ["musa"] },
+            { q: "Nabi yang memiliki suara sangat merdu dan bisa melunakkan besi adalah Nabi...", a: ["daud"] },
+            { q: "Nabi yang bisa berbicara dengan hewan dan menguasai jin adalah Nabi...", a: ["sulaiman"] },
+            { q: "Ayah dari Nabi Muhammad SAW bernama...", a: ["abdullah"] },
+            { q: "Ibu dari Nabi Muhammad SAW bernama...", a: ["aminah"] },
+            { q: "Kota kelahiran Nabi Muhammad SAW adalah kota...", a: ["mekkah"] },
+            { q: "Nabi Muhammad SAW wafat dan dimakamkan di kota...", a: ["madinah"] },
+            { q: "Salat wajib dalam sehari semalam berjumlah berapa waktu?", a: ["5", "lima"] },
+            { q: "Jumlah rakaat salat Dzuhur adalah...", a: ["4", "empat"] },
+            { q: "Jumlah rakaat salat Ashar adalah...", a: ["4", "empat"] },
+            { q: "Jumlah rakaat salat Maghrib adalah...", a: ["3", "tiga"] },
+            { q: "Jumlah rakaat salat Isya adalah...", a: ["4", "empat"] },
+            { q: "Pembersihan diri dari hadas kecil sebelum salat dinamakan...", a: ["wudhu"] },
+            { q: "Bersuci dengan menggunakan debu yang suci jika tidak ada air dinamakan...", a: ["tayamum"] },
+            { q: "Panggilan atau seruan untuk menandai masuknya waktu salat dinamakan...", a: ["azan", "adzan"] },
+            { q: "Penanda bahwa salat jamaah akan segera dimulai dinamakan...", a: ["iqamah", "iqamat"] },
+            { q: "Orang yang memimpin salat berjamah dinamakan...", a: ["imam"] },
+            { q: "Makhluk ciptaan Allah SWT yang terbuat dari cahaya (nur) adalah...", a: ["malaikat"] },
+            { q: "Makhluk ciptaan Allah SWT dari api yang selalu menggoda manusia adalah...", a: ["iblis", "syaitan"] },
+            { q: "Bulan suci tempat umat Islam diwajibkan berpuasa adalah bulan...", a: ["ramadan", "ramadhan"] },
+            { q: "Hari raya umat Islam setelah selesai menunaikan puasa Ramadan adalah Hari Raya Idul...", a: ["fitri"] },
+            { q: "Hari raya umat Islam yang identik dengan penyembelihan hewan kurban adalah Hari Raya Idul...", a: ["adha"] },
+            { q: "Zakat yang wajib dikeluarkan setiap jiwa pada bulan Ramadan dinamakan zakat...", a: ["fitri"] },
+            { q: "Zakat harta benda yang dimiliki umat Islam dinamakan zakat...", a: ["mal"] },
+            { q: "Golongan orang yang berhak menerima zakat dinamakan...", a: ["mustahik"] },
+            { q: "Gelar yang diberikan kepada Nabi Muhammad SAW karena kejujurannya adalah Al-...", a: ["amin"] },
+            { q: "Sahabat Nabi yang menjadi khalifah pertama setelah wafatnya Rasulullah adalah Abu...", a: ["bakar"] },
+            { q: "Khalifah kedua yang terkenal tegas dan adil adalah Umar bin...", a: ["khattab"] },
+            { q: "Khalifah ketiga yang menulisi Al-Quran dalam bentuk mushaf adalah Utsman bin...", a: ["affan"] },
+            { q: "Khalifah keempat yang merupakan sepupu dan menantu Rasulullah adalah Ali bin...", a: ["abi talib"] },
+            { q: "Peristiwa perjalanan malam hari Rasulullah dari Masjidil Haram ke Masjidil Aqsa dinamakan...", a: ["isra"] },
+            { q: "Peristiwa diangkatnya Rasulullah dari Masjidil Aqsa ke Sidratul Muntaha dinamakan...", a: ["miraj"] },
+            { q: "Peristiwa Isra Miraj diperingati untuk menyambut perintah ibadah...", a: ["salat"] },
+            { q: "Malam diturunkannya Al-Quran pertama kali dinamakan Nuzulul...", a: ["quran"] },
+            { q: "Surah pertama yang diturunkan dalam Al-Quran adalah Surah Al-...", a: ["alaq"] },
+            { q: "Surah pembuka dalam Al-Quran dinamakan Surah Al-...", a: ["fatihah"] },
+            { q: "Jumlah surah dalam kitab suci Al-Quran adalah...", a: ["114"] },
+            { q: "Surah terpanjang dalam Al-Quran adalah Surah Al-...", a: ["baqarah"] },
+            { q: "Surah terpendek dalam Al-Quran adalah Surah Al-...", a: ["kausar"] },
+            { q: "Sifat wajib bagi Allah SWT yang artinya Ada adalah...", a: ["wujud"] },
+            { q: "Sifat wajib bagi Allah SWT yang artinya Terdahulu adalah...", a: ["qidam"] },
+            { q: "Sifat wajib bagi Allah SWT yang artinya Kekal adalah...", a: ["baqa"] },
+            { q: "Sifat wajib bagi Rasul 'Siddiq' artinya...", a: ["jujur", "benar"] },
+            { q: "Sifat wajib bagi Rasul 'Amanah' artinya dapat...", a: ["dipercaya"] },
+            { q: "Sifat wajib bagi Rasul 'Tabligh' artinya...", a: ["menyampaikan"] },
+            { q: "Sifat wajib bagi Rasul 'Fatanah' artinya...", a: ["cerdas", "pandai"] },
+            { q: "Sifat sombong dan membanggakan diri dinamakan...", a: ["takabur"] },
+            { q: "Sifat berhias amal agar dilihat orang lain dinamakan...", a: ["riya"] },
+            { q: "Sifat iri hati atas nikmat orang lain dinamakan...", a: ["hasad"] },
+            { q: "Perbuatan menyekutukan Allah SWT dengan sesuatu yang lain dinamakan...", a: ["syirik"] },
+            { q: "Orang yang menyekutukan Allah SWT disebut orang...", a: ["musyrik"] },
+            { q: "Orang yang mengaku Islam tetapi hatinya ingkar dinamakan orang...", a: ["munafik"] },
+            { q: "Ciri orang munafik jika berkata ia...", a: ["dusta", "bohong"] },
+            { q: "Tempat ibadah umat Islam dinamakan...", a: ["masjid"] },
+            { q: "Hari akhir atau hari hancurnya alam semesta dinamakan hari...", a: ["kiamat"] },
+            { q: "Kiamat kecil seperti kematian seseorang dinamakan kiamat...", a: ["sugra"] },
+            { q: "Kiamat besar hancurnya seluruh alam semesta dinamakan kiamat...", a: ["kubra"] },
+            { q: "Alam kubur tempat persinggahan sementara dinamakan alam...", a: ["barzakh"] },
+            { q: "Hari dibangkitkannya manusia dari alam kubur dinamakan Yaumul...", a: ["ba'as"] },
+            { q: "Hari dikumpulkannya manusia di Padang Mahsyar dinamakan Yaumul...", a: ["mahsyar"] },
+            { q: "Hari perhitungan amal perbuatan manusia dinamakan Yaumul...", a: ["hisab"] },
+            { q: "Hari penimbangan amal perbuatan manusia dinamakan Yaumul...", a: ["mizan"] },
+            { q: "Jembatan yang membentang di atas neraka dinamakan Siratal...", a: ["mustakim"] },
+            { q: "Tempat balasan bagi orang-orang yang beriman dan beramal saleh adalah...", a: ["surga"] },
+            { q: "Tempat balasan bagi orang-orang durhaka dan ingkar adalah...", a: ["neraka"] },
+            { q: "Perbuatan baik yang pahalanya terus mengalir meskipun sudah meninggal dinamakan amal...", a: ["jariah"] },
+            { q: "Makan di malam hari sebelum fajar untuk persiapan puasa dinamakan...", a: ["sahur"] },
+            { q: "Menyegera makan/minum ketika waktu Maghrib tiba saat puasa dinamakan...", a: ["buka puasa", "ifthar"] },
+            { q: "Salat sunnah yang hanya ada pada malam bulan Ramadan adalah salat...", a: ["tarawih"] },
+            { q: "Salat sunnah yang dilakukan untuk memohon hujan dinamakan salat...", a: ["istisqa"] },
+            { q: "Salat sunnah yang dilakukan saat terjadi gerhana dinamakan salat...", a: ["kusuf"] },
+            { q: "Salat sunnah yang bertujuan menentukan pilihan dinamakan salat...", a: ["istikharah"] },
+            { q: "Salat meminta petunjuk dan ampunan pada sepertiga malam dinamakan salat...", a: ["tahajud"] },
+            { q: "Salat sunnah pencerah rezeki di pagi hari dinamakan salat...", a: ["duha"] },
+            { q: "Rukun haji yang berupa berlari-lari kecil antara bukit Safa dan Marwah dinamakan...", a: ["sai"] }
+        ],
+
+        infor: [
+            { q: "Otak utama atau pemroses pusat komputer disebut...", a: ["cpu"] },
+            { q: "Perangkat keras untuk mengetik teks dinamakan...", a: ["keyboard"] },
+            { q: "Singkatan dari World Wide Web adalah...", a: ["www"] },
+            { q: "Perangkat keras yang digunakan untuk menggerakkan kursor dinamakan...", a: ["mouse"] },
+            { q: "Jaringan komputer global yang saling terhubung dinamakan...", a: ["internet"] },
+            { q: "Sistem biner komputer hanya terdiri dari dua angka, yaitu 0 dan...", a: ["1"] },
+            { q: "Perangkat keras tempat menampilkan visual gambar/layar monitor dinamakan...", a: ["monitor"] },
+            { q: "Perangkat lunak utama pengelola sistem komputer seperti Windows atau Linux dinamakan OS atau...", a: ["sistem operasi"] },
+            { q: "Memori penyimpanan sementara pada komputer dinamakan...", a: ["ram"] },
+            { q: "Perangkat keras penyimpanan permanen utama dinamakan hard...", a: ["disk"] },
+            { q: "Aplikasi browser buatan Google adalah Google...", a: ["chrome"] },
+            { q: "Perangkat untuk mencetak dokumen kertas dinamakan...", a: ["printer"] },
+            { q: "Perangkat untuk memindai dokumen fisik menjadi digital dinamakan...", a: ["scanner"] },
+            { q: "Perangkat penyimpan data portabel kecil dengan antarmuka USB dinamakan flash...", a: ["disk"] },
+            { q: "Bahasa pemograman untuk pengembangan gaya tampilan halaman web disingkat...", a: ["css"] },
+            { q: "Bahasa markah standar untuk pembuat halaman web disingkat...", a: ["html"] },
+            { q: "Shortkey keyboard untuk menyalin teks (Copy) adalah Ctrl + ...", a: ["c"] },
+            { q: "Shortkey keyboard untuk menempelkan teks (Paste) adalah Ctrl + ...", a: ["v"] },
+            { q: "Shortkey keyboard untuk memotong teks (Cut) adalah Ctrl + ...", a: ["x"] },
+            { q: "Shortkey keyboard untuk membatalkan perintah (Undo) adalah Ctrl + ...", a: ["z"] },
+            { q: "Alat penampung daya cadangan saat listrik padam untuk komputer dinamakan...", a: ["ups"] },
+            { q: "Perangkat jaringan penghubung antar komputer dinamakan...", a: ["router", "switch"] },
+            { q: "Istilah untuk kejahatan pencurian identitas/data di internet dinamakan...", a: ["phishing"] },
+            { q: "Program jahat yang merusak sistem komputer dinamakan...", a: ["virus", "malware"] },
+            { q: "Program anti-kejahatan untuk membersihkan komputer dari virus dinamakan...", a: ["antivirus"] },
+            { q: "Aplikasi pengolah kata terkenal buatan Microsoft adalah Microsoft...", a: ["word"] },
+            { q: "Aplikasi pengolah angka tabel terkenal buatan Microsoft adalah Microsoft...", a: ["excel"] },
+            { q: "Aplikasi presentasi terkenal buatan Microsoft adalah Microsoft...", a: ["powerpoint"] },
+            { q: "Simbol angka 1 dan 0 dalam pengkodean komputer dinamakan biner atau...", a: ["binary"] },
+            { q: "1 Kilobyte (KB) setara dengan berapa byte?", a: ["1024"] },
+            { q: "1 Megabyte (MB) setara dengan berapa Kilobyte?", a: ["1024"] },
+            { q: "1 Gigabyte (GB) setara dengan berapa Megabyte?", a: ["1024"] },
+            { q: "Ekstensi file untuk dokumen Microsoft Word biasanya berakhir dengan .docx atau ....", a: ["doc"] },
+            { q: "Ekstensi file gambar umum di internet adalah .png dan ....", a: ["jpg", "jpeg"] },
+            { q: "Pintu masuk/keluar sambungan fisik perangkat ke komputer dinamakan...", a: ["port"] },
+            { q: "Teknologi nirkabel untuk transfer data antar perangkat jarak pendek dinamakan...", a: ["bluetooth"] },
+            { q: "Jaringan nirkabel internet lokal dikenal dengan sebutan...", a: ["wifi"] },
+            { q: "Proses mengunduh berkas dari internet ke perangkat dinamakan...", a: ["download"] },
+            { q: "Proses mengunggah berkas dari perangkat ke internet dinamakan...", a: ["upload"] },
+            { q: "Layanan penyimpan data berbasis internet dinamakan cloud...", a: ["storage"] },
+            { q: "Situs pencari populer internet di dunia adalah...", a: ["google"] },
+            { q: "Alamat unik sebuah situs web di internet dinamakan...", a: ["url"] },
+            { q: "Format file standar dokumen siap cetak buatan Adobe adalah...", a: ["pdf"] },
+            { q: "Bagian fisik dari sistem komputer yang dapat disentuh dinamakan...", a: ["hardware"] },
+            { q: "Bagian tak berwujud berupa program sistem komputer dinamakan...", a: ["software"] },
+            { q: "Pengguna atau manusia yang mengoperasikan komputer dinamakan...", a: ["brainware"] },
+            { q: "Perangkat penerima suara pada komputer dinamakan...", a: ["microphone", "mikrofon"] },
+            { q: "Perangkat output suara komputer dinamakan...", a: ["speaker"] },
+            { q: "Langkah-langkah logis tersusun untuk menyelesaikan masalah dinamakan...", a: ["algoritma"] },
+            { q: "Diagram alir alur kerja algoritma dinamakan...", a: ["flowchart"] },
+            { q: "Bahasa pemrograman populer bersimbol ular piton dinamakan...", a: ["python"] },
+            { q: "Sistem operasi seluler paling populer buatan Google adalah...", a: ["android"] },
+            { q: "Sistem operasi buatan Apple untuk iPhone dinamakan...", a: ["ios"] },
+            { q: "Perusahaan pembuat sistem operasi Windows adalah...", a: ["microsoft"] },
+            { q: "Otak/papan induk tempat memasang semua komponen komputer dinamakan...", a: ["motherboard"] },
+            { q: "Kartu pengolah grafis gambar pada komputer disingkat...", a: ["gpu", "vga"] },
+            { q: "Jaringan komputer area terbatas lokal dinamakan...", a: ["lan"] },
+            { q: "Jaringan komputer seluas dunia dinamakan...", a: ["wan"] },
+            { q: "Tindakan meretas atau membobol sistem komputer dinamakan...", a: ["hacking"] },
+            { q: "Orang yang melakukan pembobolan sistem komputer dinamakan...", a: ["hacker"] },
+            { q: "Pesan sampah otomatis di email/media sosial dinamakan...", a: ["spam"] },
+            { q: "Kotak surat elektronik untuk berkirim pesan di internet dinamakan...", a: ["email"] },
+            { q: "Simbol pemisah nama pengguna dan domain pada alamat email adalah...", a: ["@"] },
+            { q: "Penyimpanan data cepat berkapasitas kecil di dalam CPU dinamakan...", a: ["cache"] },
+            { q: "Proses menyalakan ulang sistem komputer dinamakan...", a: ["reboot", "restart"] },
+            { q: "Proses booting dari kondisi komputer mati dinamakan cold...", a: ["booting"] },
+            { q: "Layar sentuh pada smartphone dinamakan touch...", a: ["screen"] },
+            { q: "Teknologi simulasi dunia virtual buatan dinamakan Virtual...", a: ["reality"] },
+            { q: "Kecerdasan buatan dalam dunia teknologi disingkat AI atau Artificial...", a: ["intelligence"] },
+            { q: "Pencetak 3 Dimensi dinamakan printer...", a: ["3d"] },
+            { q: "Aplikasi media sosial pesan singkat populer buatan Meta adalah...", a: ["whatsapp"] },
+            { q: "Aplikasi media sosial berbasis video pendek populer dari ByteDance adalah...", a: ["tiktok"] },
+            { q: "Karakter dasar ASCII mewakili angka, huruf, dan...", a: ["simbol"] },
+            { q: "Tombol pada keyboard untuk menghapus karakter di sebelah kiri kursor adalah...", a: ["backspace"] },
+            { q: "Tombol pada keyboard untuk menghapus karakter di sebelah kanan kursor adalah...", a: ["delete"] },
+            { q: "Tombol pada keyboard untuk membuat tulisan kapital terus menerus adalah...", a: ["caps lock"] },
+            { q: "Tombol paling pojok kiri atas keyboard untuk membatalkan adalah...", a: ["esc", "escape"] },
+            { q: "Satuan kecepatan transmisi data internet biasanya dinyatakan dalam bps atau bit per...", a: ["second", "detik"] },
+            { q: "Sistem bilangan berbasis 16 dalam komputer dinamakan...", a: ["heksadesimal"] },
+            { q: "Sistem bilangan berbasis 8 dalam komputer dinamakan...", a: ["oktal"] },
+            { q: "Kamera yang terpasang pada komputer/laptop untuk video conference dinamakan...", a: ["webcam"] },
+            { q: "Istilah menembak/menguji koneksi jaringan komputer adalah perintah...", a: ["ping"] },
+            { q: "Perangkat modem berfungsi mengubah sinyal analog menjadi sinyal...", a: ["digital"] },
+            { q: "Kabel jaringan umum berujung konektor RJ45 dinamakan kabel...", a: ["utp", "lan"] },
+            { q: "Teknologi serat kaca penghantar data kecepatan tinggi dinamakan fiber...", a: ["optik"] },
+            { q: "Proses konversi data menjadi kode rahasia dinamakan...", a: ["enkripsi"] },
+            { q: "Proses membuka kembali kode rahasia terenkripsi dinamakan...", a: ["dekripsi"] },
+            { q: "Perangkat komputer jinjing portabel dinamakan...", a: ["laptop"] },
+            { q: "Papan ketik layar pada ponsel pintar dinamakan virtual...", a: ["keyboard"] },
+            { q: "Aplikasi pengolah grafis buatan Adobe untuk mengedit foto adalah Adobe...", a: ["photoshop"] },
+            { q: "Aplikasi vektor grafis populer buatan Corel adalah Corel...", a: ["draw"] },
+            { q: "Standard konektor daya/data serbaguna universal saat ini adalah USB Type-...", a: ["c"] },
+            { q: "Aktivitas siaran langsung di internet dinamakan live...", a: ["streaming"] },
+            { q: "Buku harian berbasis web dinamakan...", a: ["blog"] },
+            { q: "Ruang penyimpanan berbasis awan buatan Google adalah Google...", a: ["drive"] },
+            { q: "Kumpulan data terstruktur yang dikelola dalam komputer dinamakan basis data atau...", a: ["database"] },
+            { q: "Bahasa pemrograman standar pengelola database relational adalah...", a: ["sql"] },
+            { q: "Sistem komputer khusus penyedia layanan data untuk komputer klien dinamakan...", a: ["server"] }
+        ],
+
+        pkn: [
+            { q: "Ada berapa jumlah sila dalam Pancasila?", a: ["5", "lima"] },
+            { q: "Lambang dari sila pertama Pancasila adalah...", a: ["bintang"] },
+            { q: "Semboyan nasional bangsa Indonesia adalah Bhinneka Tunggal...", a: ["ika"] },
+            { q: "Warna bendera nasional negara Indonesia adalah...", a: ["merah putih"] },
+            { q: "Dasar negara Republik Indonesia adalah...", a: ["pancasila"] },
+            { q: "Lambang dari sila kedua Pancasila adalah...", a: ["rantai"] },
+            { q: "Lambang dari sila ketiga Pancasila adalah pohon...", a: ["beringin"] },
+            { q: "Lambang dari sila keempat Pancasila adalah kepala...", a: ["banteng"] },
+            { q: "Lambang dari sila kelima Pancasila adalah padi dan...", a: ["kapas"] },
+            { q: "UUD 1945 singkatan dari Undang-Undang...", a: ["dasar"] },
+            { q: "Pancasila dirumuskan pada sidang BPUPKI pertama oleh tiga tokoh, salah satunya adalah Ir....", a: ["soekarno"] },
+            { q: "Ketua BPUPKI adalah Dr. KRT Radjiman...", a: ["wedyodiningrat"] },
+            { q: "Singkatan dari Badan Penyelidik Usaha-Usaha Persiapan Kemerdekaan Indonesia adalah...", a: ["bpupki"] },
+            { q: "Singkatan dari Panitia Persiapan Kemerdekaan Indonesia adalah...", a: ["ppki"] },
+            { q: "Lagu kebangsaan Indonesia Raya diciptakan oleh...", a: ["wr supratman"] },
+            { q: "Penetapan Hari Lahir Pancasila jatuh pada tanggal...", a: ["1 juni"] },
+            { q: "Hari Kesaktian Pancasila diperingati setiap tanggal...", a: ["1 oktober"] },
+            { q: "Bhinneka Tunggal Ika artinya Berbeda-beda tetapi tetap...", a: ["satu"] },
+            { q: "Semboyan Bhinneka Tunggal Ika diambil dari Kitab Sutasoma karangan Mpu...", a: ["tantular"] },
+            { q: "Bentuk negara Indonesia sesuai pasal 1 ayat 1 UUD 1945 adalah negara...", a: ["kesatuan"] },
+            { q: "Sistem pemerintahan Indonesia adalah...", a: ["presidensial"] },
+            { q: "Kepala negara sekaligus kepala pemerintahan di Indonesia adalah...", a: ["presiden"] },
+            { q: "Masa jabatan presiden Indonesia dalam satu periode adalah berapa tahun?", a: ["5", "lima"] },
+            { q: "Presiden dan Wakil Presiden dipilih secara langsung oleh rakyat melalui...", a: ["pemilu"] },
+            { q: "Singkatan dari Komisi Pemilihan Umum adalah...", a: ["kpu"] },
+            { q: "Lembaga tinggi negara yang bertugas membuat undang-undang adalah...", a: ["dpr"] },
+            { q: "DPR singkatan dari Dewan Perwakilan...", a: ["rakyat"] },
+            { q: "MPR singkatan dari Majelis Permusyawaratan...", a: ["rakyat"] },
+            { q: "Lembaga yudikatif pemegang kekuasaan kehakiman tertinggi di Indonesia adalah Mahkamah...", a: ["agung"] },
+            { q: "Lembaga penguji kesesuaian undang-undang terhadap UUD 1945 adalah Mahkamah...", a: ["konstitusi"] },
+            { q: "Hak DPR untuk mengajukan rancangan undang-undang dinamakan hak...", a: ["inisiatif"] },
+            { q: "Hak DPR untuk melakukan penyelidikan dinamakan hak...", a: ["angket"] },
+            { q: "Hak DPR untuk meminta keterangan kepada pemerintah dinamakan hak...", a: ["interpelasi"] },
+            { q: "Sesuatu yang mutlak menjadi milik kita dan penggunaannya tergantung pada kita dinamakan...", a: ["hak"] },
+            { q: "Sesuatu yang wajib dilaksanakan dengan penuh tanggung jawab dinamakan...", a: ["kewajiban"] },
+            { q: "HAM singkatan dari Hak Asasi...", a: ["manusia"] },
+            { q: "Organisasi internasional pelindung HAM di Indonesia disingkat Komnas...", a: ["ham"] },
+            { q: "Sikap saling menghargai dan menghormati perbedaan dinamakan...", a: ["toleransi"] },
+            { q: "Sikap cinta terhadap tanah air dinamakan...", a: ["nasionallisme", "patriotisme"] },
+            { q: "Sikap rela berkorban demi bangsa dan negara dinamakan...", a: ["patriotisme"] },
+            { q: "Sistem gotong royong merupakan ciri khas budaya bangsa...", a: ["indonesia"] },
+            { q: "Pancasila sebagai pemersatu bangsa berfungsi sebagai pandangan...", a: ["hidup"] },
+            { q: "Pasal dalam UUD 1945 yang mengatur kebebasan beragama adalah pasal...", a: ["29"] },
+            { q: "Tiga tingkatan pemerintahan daerah di Indonesia yaitu Provinsi, Kabupaten, dan...", a: ["kota"] },
+            { q: "Pemerintah daerah tingkat provinsi dipimpin oleh seorang...", a: ["gubernur"] },
+            { q: "Pemerintah daerah tingkat kabupaten dipimpin oleh seorang...", a: ["bupati"] },
+            { q: "Pemerintah daerah tingkat kota dipimpin oleh seorang...", a: ["walikota"] },
+            { q: "Pemerintah tingkat kecamatan dipimpin oleh seorang...", a: ["camat"] },
+            { q: "Wilayah kelurahan dipimpin oleh seorang...", a: ["lurah"] },
+            { q: "Wilayah desa dipimpin oleh seorang kepala...", a: ["desa"] },
+            { q: "Lembaga musyawarah tingkat desa disingkat BPD atau Badan Permusyawaratan...", a: ["desa"] },
+            { q: "Norma yang bersumber dari hati nurani manusia dinamakan norma...", a: ["kesusilaan"] },
+            { q: "Norma yang bersumber dari pergaulan masyarakat dinamakan norma...", a: ["kesopanan"] },
+            { q: "Norma yang bersumber dari kitab suci agama dinamakan norma...", a: ["agama"] },
+            { q: "Norma tertulis yang dibuat oleh lembaga berwenang dinamakan norma...", a: ["hukum"] },
+            { q: "Sanksi bagi pelanggar norma hukum bersifat...", a: ["tegas", "memaksa"] },
+            { q: "Aturan hukum tertinggi di Indonesia adalah...", a: ["uud 1945"] },
+            { q: "Amandemen UUD 1945 telah dilakukan sebanyak berapa kali?", a: ["4", "empat"] },
+            { q: "Proklamasi Kemerdekaan Indonesia dibacakan pada hari...", a: ["jumat"] },
+            { q: "Lokasi pembacaan teks proklamasi berada di Jalan Pegangsaan Timur No. ...", a: ["56"] },
+            { q: "Lambang Negara Republik Indonesia adalah Garuda...", a: ["pancasila"] },
+            { q: "Jumlah bulu pada leher burung Garuda Pancasila melambangkan tahun kemerdekaan, berjumlah...", a: ["45"] },
+            { q: "Jumlah bulu pada masing-masing sayap burung Garuda melambangkan tanggal kemerdekaan, berjumlah...", a: ["17"] },
+            { q: "Jumlah bulu pada ekor burung Garuda melambangkan bulan kemerdekaan, berjumlah...", a: ["8"] },
+            { q: "Jumlah bulu di bawah perisai/pangkal ekor burung Garuda berjumlah...", a: ["19"] },
+            { q: "NKRI singkatan dari Negara Kesatuan Republik...", a: ["indonesia"] },
+            { q: "Wilayah laut Indonesia yang ditarik 12 mil laut dari garis pantai dinamakan laut...", a: ["teritorial"] },
+            { q: "Batas wilayah laut ekonomik eksklusif Indonesia disingkat ZEE sejauh...", a: ["200 mil"] },
+            { q: "Kepolisian Negara Republik Indonesia disingkat...", a: ["polri"] },
+            { q: "Tentara Nasional Indonesia disingkat...", a: ["tni"] },
+            { q: "TNI Angkatan Darat disingkat TNI-...", a: ["ad"] },
+            { q: "TNI Angkatan Laut disingkat TNI-...", a: ["al"] },
+            { q: "TNI Angkatan Udara disingkat TNI-...", a: ["au"] },
+            { q: "Sistem pertahanan keamanan di Indonesia disingkat Sishankamrata, yaitu sistem pertahanan keamanan rakyat...", a: ["semesta"] },
+            { q: "Kewajiban membela negara diatur dalam UUD 1945 Pasal...", a: ["27"] },
+            { q: "Pasal 31 UUD 1945 mengatur tentang hak mendapatkan...", a: ["pendidikan"] },
+            { q: "Pasal 33 UUD 1945 mengatur tentang perekonomian...", a: ["nasional"] },
+            { q: "Landasan idiil negara Indonesia adalah...", a: ["pancasila"] },
+            { q: "Landasan konstitusional negara Indonesia adalah...", a: ["uud 1945"] },
+            { q: "Konsep wawasan kebangsaan Indonesia dinamakan Wawasan...", a: ["nusantara"] },
+            { q: "Sikap pengakuan bahwa Indonesia adalah negara kepulauan dinamakan Wawasan...", a: ["nusantara"] },
+            { q: "Perubahan resmi naskah UUD 1945 dinamakan...", a: ["amandemen"] },
+            { q: "Sila pertama Pancasila mengajarkan kita untuk percaya kepada...", a: ["tuhan"] },
+            { q: "Sila kedua Pancasila menjunjung tinggi nilai...", a: ["kemanusiaan"] },
+            { q: "Sila ketiga Pancasila mengutamakan rasa...", a: ["persatuan"] },
+            { q: "Sila keempat Pancasila mengutamakan pengambilan keputusan secara...", a: ["musyawarah"] },
+            { q: "Sila kelima Pancasila bertujuan mewujudkan keadilan...", a: ["sosial"] },
+            { q: "Badan pemeriksaan keuangan negara Indonesia disingkat...", a: ["bpk"] },
+            { q: "Lembaga pencegah dan pemberantas korupsi di Indonesia disingkat...", a: ["kpk"] },
+            { q: "KPK singkatan dari Komisi Pemberantasan...", a: ["korupsi"] },
+            { q: "Hari Sumpah Pemuda diperingati setiap tanggal...", a: ["28 oktober"] },
+            { q: "Hari Pahlawan diperingati setiap tanggal...", a: ["10 november"] },
+            { q: "Hari Pendidikan Nasional diperingati setiap tanggal...", a: ["2 mei"] },
+            { q: "Bapak Pendidikan Nasional Indonesia adalah Ki Hajar...", a: ["dewantara"] },
+            { q: "Semboyan Ki Hajar Dewantara di depan memberi teladan adalah 'Ing Ngarsa Sung...", a: ["tuladha"] },
+            { q: "Semboyan di tengah memberi semangat adalah 'Ing Madya Mangun...", a: ["karsa"] },
+            { q: "Semboyan di belakang memberi dorongan adalah 'Tut Wuri...", a: ["handayani"] }
+        ],
+
+        seni: [
+            { q: "Alat musik tradisional Angklung berasal dari provinsi...", a: ["jawa barat"] },
+            { q: "Tari Saman yang terkenal berasal dari daerah...", a: ["aceh"] },
+            { q: "Warna primer terdiri dari merah, kuning, dan...", a: ["biru"] },
+            { q: "Alat yang digunakan untuk mengoleskan cat ke kanvas lukis dinamakan...", a: ["kuas"] },
+            { q: "Pencampuran warna merah dan kuning menghasilkan warna...", a: ["oranye", "jingga"] },
+            { q: "Pencampuran warna biru dan kuning menghasilkan warna...", a: ["hijau"] },
+            { q: "Pencampuran warna merah dan biru menghasilkan warna...", a: ["ungu"] },
+            { q: "Tari Pendet berasal dari daerah...", a: ["bali"] },
+            { q: "Tari Kecak berasal dari daerah...", a: ["bali"] },
+            { q: "Tari Jaipong berasal dari provinsi...", a: ["jawa barat"] },
+            { q: "Tari Piring berasal dari provinsi...", a: ["sumatera barat"] },
+            { q: "Tari Reog berasal dari kota Ponorogo di provinsi...", a: ["jawa timur"] },
+            { q: "Seni mengukir pada kayu atau batu dinamakan seni...", a: ["ukir", "pahat"] },
+            { q: "Kain batik karya tradisional asli dari Indonesia ditetapkan oleh...", a: ["unesco"] },
+            { q: "Alat khusus untuk menggoreskan lilin malam pada kain batik dinamakan...", a: ["canting"] },
+            { q: "Lilin perekat dalam proses pembuat batik dinamakan...", a: ["malam"] },
+            { q: "Seni melipat kertas khas Jepang dinamakan...", a: ["origami"] },
+            { q: "Alat musik petik khas NTT dinamakan...", a: ["sasando"] },
+            { q: "Alat musik tradisional yang dipukul dan berasal dari bambu dinamakan...", a: ["calung", "kolintang"] },
+            { q: "Alat musik tradisional perkusi bambu dari Sulawesi Utara dinamakan...", a: ["kolintang"] },
+            { q: "Gamelan adalah himpunan alat musik tradisional khas suku Jawa dan...", a: ["bali", "sunda"] },
+            { q: "Seni pertunjukan bayangan kulit tradisional Jawa dinamakan wayang...", a: ["kulit"] },
+            { q: "Orang yang memainkan pertunjukan wayang dinamakan...", a: ["dalang"] },
+            { q: "Penyanyi wanita dalam seni pertunjukan karawitan Jawa dinamakan...", a: ["pesinden", "sinden"] },
+            { q: "Lagu daerah 'Soleram' berasal dari daerah...", a: ["riau"] },
+            { q: "Lagu daerah 'Kicir-Kicir' berasal dari...", a: ["jakarta", "betawi"] },
+            { q: "Lagu daerah 'Gundul Pacul' berasal dari...", a: ["jawa tengah"] },
+            { q: "Lagu daerah 'Manuk Dadali' berasal dari...", a: ["jawa barat"] },
+            { q: "Lagu daerah 'Cublak Cublak Suweng' berasal dari...", a: ["jawa tengah"] },
+            { q: "Tangga nada musik yang terdiri dari 5 nada dinamakan tangga nada...", a: ["pentatonis"] },
+            { q: "Tangga nada musik yang terdiri dari 7 nada dinamakan tangga nada...", a: ["diatonis"] },
+            { q: "Nada Do, Re, Mi, Fa, Sol, La, Si dinamakan tangga nada...", a: ["diatonis"] },
+            { q: "Kecepatan irama lagu dinamakan...", a: ["tempo"] },
+            { q: "Keras dan lembutnya nada yang dinyanyikan dinamakan...", a: ["dinamika"] },
+            { q: "Tinggi rendahnya nada dalam musik dinamakan...", a: ["pitch", "intonasi"] },
+            { q: "Alat musik tiup modern dari logam yang sering untuk musik jazz adalah...", a: ["saksofon", "saxophone"] },
+            { q: "Alat musik tuts tekan modern adalah...", a: ["piano", "keyboard"] },
+            { q: "Seni menggambar wajah manusia dinamakan seni gambar...", a: ["potret"] },
+            { q: "Seni rupa 3 dimensi yang memiliki panjang, lebar, dan volume dinamakan...", a: ["patung"] },
+            { q: "Unsur seni rupa terdasar yang merupakan titik awal pembuatan garis adalah...", a: ["titik", "bintik"] },
+            { q: "Goresan kontinyu dari satu titik ke titik lain membentuk...", a: ["garis"] },
+            { q: "Warna hitam dan putih tergolong ke dalam warna...", a: ["netral"] },
+            { q: "Latar belakang bidang dalam karya seni rupa dinamakan...", a: ["background"] },
+            { q: "Seni menempelkan potongan gambar/kertas menjadi karya baru dinamakan...", a: ["kolase"] },
+            { q: "Seni menempelkan pecahan kaca/keramik berwarna dinamakan...", a: ["mosaik"] },
+            { q: "Seni merangkai potongan kain perca dinamakan...", a: ["montase"] },
+            { q: "Gitar adalah jenis alat musik yang dimainkan dengan cara...", a: ["dipetik"] },
+            { q: "Biola adalah jenis alat musik yang dimainkan dengan cara...", a: ["digesek"] },
+            { q: "Seruling adalah jenis alat musik yang dimainkan dengan cara...", a: ["ditiup"] },
+            { q: "Drum adalah jenis alat musik yang dimainkan dengan cara...", a: ["dipukul"] },
+            { q: "Pameran seni tempat memperlihatkan karya patung/lukisan dinamakan...", a: ["pameran"] },
+            { q: "Pencipta lagu dinamakan...", a: ["komponis", "pencipta lagu"] },
+            { q: "Pemimpin kelompok paduan suara dinamakan...", a: ["dirigen", "konduktor"] },
+            { q: "Kelompok bernyanyi bersama dinamakan paduan...", a: ["suara"] },
+            { q: "Bernyanyi sendirian dinamakan penyanyi...", a: ["solo"] },
+            { q: "Bernyanyi berdua dinamakan...", a: ["duet"] },
+            { q: "Bernyanyi bertiga dinamakan...", a: ["trio"] },
+            { q: "Bernyanyi berempat dinamakan...", a: ["kuartet"] },
+            { q: "Seni tari berpola kelompok banyak orang dinamakan tari...", a: ["kelompok", "massal"] },
+            { q: "Properti utama pada Tari Piring adalah...", a: ["piring"] },
+            { q: "Properti utama pada Tari Payung adalah...", a: ["payung"] },
+            { q: "Properti utama pada Tari Kipas Pakarena adalah...", a: ["kipas"] },
+            { q: "Properti utama pada Tari Serimpi berupa kain selendang atau...", a: ["sampur"] },
+            { q: "Seni pertunjukan teater tradisional Betawi dinamakan...", a: ["lenong"] },
+            { q: "Seni pertunjukan teater tradisional Jawa Timur dinamakan...", a: ["ludruk"] },
+            { q: "Seni pertunjukan teater tradisional Jawa Tengah dinamakan ketoprak...", a: ["ketoprak"] },
+            { q: "Seni pertunjukan drama tari tradisional Bali dinamakan...", a: ["arja"] },
+            { q: "Papan tempat mencampur cat lukis dinamakan...", a: ["palet"] },
+            { q: "Kain khusus media melukis dengan cat minyak dinamakan...", a: ["kanvas"] },
+            { q: "Patung monumen untuk mengenang pahlawan tergolong seni rupa... dimensi", a: ["3", "tiga"] },
+            { q: "Lukisan pada permukaan datar tergolong seni rupa... dimensi", a: ["2", "dua"] },
+            { q: "Seni merajut benang menggunakan jarum tunggal dinamakan...", a: ["renda", "crochet"] },
+            { q: "Seni anyam bambu/rotan biasa digunakan membuat kerajinan...", a: ["anyaman"] },
+            { q: "Bahan tanah liat biasa digunakan untuk membuat kerajinan...", a: ["gerabah", "keramik"] },
+            { q: "Tungku khusus pembakaran gerabah/keramik dinamakan...", a: ["tungku"] },
+            { q: "Kain tenun khas daerah Nusa Tenggara Barat dinamakan kain...", a: ["ikat", "tenun"] },
+            { q: "Kain khas daerah Palembang dinamakan kain...", a: ["songket"] },
+            { q: "Kain khas daerah Batak Medan dinamakan kain...", a: ["ulos"] },
+            { q: "Mote/manik-manik hiasan pakaian terbuat dari...", a: ["plastik", "kaca"] },
+            { q: "Proses mewarnai kain batik dengan mencelup dinamakan...", a: ["pencelupan"] },
+            { q: "Motif batik parang berasal dari kota...", a: ["yogyakarta", "solo"] },
+            { q: "Motif batik mega mendung berciri khas awan, berasal dari...", a: ["cirebon"] },
+            { q: "Garis lurus mendatar dalam menggambar dinamakan garis...", a: ["horizontal"] },
+            { q: "Garis lurus tegak berdiri dinamakan garis...", a: ["vertikal"] },
+            { q: "Garis miring dinamakan garis...", a: ["diagonal"] },
+            { q: "Kesan gelap terang dalam lukisan dapat diciptakan dengan teknik...", a: ["arsir"] },
+            { q: "Teknik mengarsir menggunakan titik-titik dinamakan...", a: ["pointilis"] },
+            { q: "Teknik melukis dengan sapuan cat air yang tipis transparan dinamakan...", a: ["akuarel"] },
+            { q: "Teknik melukis dengan cat tebal menutup dinamakan...", a: ["plakat"] },
+            { q: "Seni patung figuratif menyerupai bentuk...", a: ["alam", "manusia"] },
+            { q: "Seni patung non-figuratif berbentuk...", a: ["abstrak"] },
+            { q: "Alat musik harmonika dimainkan dengan cara...", a: ["ditiup"] },
+            { q: "Alat musik marakas dimainkan dengan cara...", a: ["digoyang"] },
+            { q: "Alat musik meksiko Gitarak dimainkan dengan cara...", a: ["dipetik"] },
+            { q: "Keindahan susunan irama dalam musik dinamakan...", a: ["harmoni"] },
+            { q: "Tari Tor-Tor berasal dari provinsi...", a: ["sumatera utara"] },
+            { q: "Gong dimainkan dengan cara...", a: ["dipukul"] },
+            { q: "Terompet terbuat dari bahan...", a: ["logam", "kuningan"] }
+        ]
+    };
+
+    // STATE KUIS
+    let currentMode = 'pu';
+    let currentPage = 1;
+    let currentQIndex = 0;
+    let activeQuestions = [];
+    let isMasterUnlocked = false;
+    let activeMiniGame = 0;
+
+    function changePage(dir) {
+        currentPage += dir;
+        if (currentPage < 1) currentPage = 1;
+        if (currentPage > 2) currentPage = 2;
+
+        document.getElementById('page-indicator').innerText = `${currentPage} / 2`;
+        document.getElementById('prev-page').disabled = (currentPage === 1);
+        document.getElementById('next-page').disabled = (currentPage === 2);
+
+        if (currentPage === 1) {
+            document.getElementById('page-1').classList.remove('hidden');
+            document.getElementById('page-2').classList.add('hidden');
+        } else {
+            document.getElementById('page-1').classList.add('hidden');
+            document.getElementById('page-2').classList.remove('hidden');
+        }
+    }
+
+    function selectMode(mode) {
+        currentMode = mode;
+        const cfg = modeConfig[mode];
+        
+        document.body.style.background = cfg.theme;
+        document.documentElement.style.setProperty('--accent-main', cfg.accent);
+
+        document.getElementById('mode-header-title').innerHTML = `<i class="fa-solid fa-book-open"></i> KELAS ${cfg.name.toUpperCase()}`;
+        document.getElementById('teacher-display-name').innerHTML = `<i class="fa-solid fa-user-tie"></i> ${cfg.teacher}`;
+        document.getElementById('teacher-box-element').style.borderLeftColor = cfg.accent;
+
+        activeQuestions = [...masterDatabase[mode]].sort(() => Math.random() - 0.5);
+        currentQIndex = 0;
+
+        document.getElementById('mode-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        loadQuestion();
+    }
+
+    function returnToMenu() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('punishment-screen').classList.add('hidden');
+        document.getElementById('game-container').classList.add('hidden');
+        document.getElementById('mode-screen').classList.remove('hidden');
+        document.body.style.background = "linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%)";
+    }
+
+    function loadQuestion() {
+        document.getElementById('quiz-feedback').innerHTML = "";
+        document.getElementById('answer-input').value = "";
+        activeMiniGame = 0;
+        
+        let q = activeQuestions[currentQIndex];
+        
+        let progressPercent = ((currentQIndex + 1) / activeQuestions.length) * 100;
+        document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+        document.getElementById('q-counter').innerHTML = `<i class="fa-solid fa-bullseye"></i> Pertanyaan ${currentQIndex + 1} dari ${activeQuestions.length}`;
+        
+        document.getElementById('question-text').innerText = q.q;
+        document.getElementById('answer-input').focus();
+    }
+
+    function handleKeyPress(e) {
+        if (e.key === 'Enter') checkAnswer();
+    }
+
+    function checkAnswer() {
+        let userAns = document.getElementById('answer-input').value.trim().toLowerCase();
+        let q = activeQuestions[currentQIndex];
+
+        if (userAns !== "" && q.a.includes(userAns)) {
+            document.getElementById('quiz-feedback').innerHTML = "<p style='color: var(--accent-green);'><i class='fa-solid fa-circle-check'></i> Bagus! Jawabanmu tepat!</p>";
+            setTimeout(() => nextQuestion(), 800);
+        } else {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('wrong-reason').innerText = `Jawaban yang tepat: ${q.a[0].toUpperCase()}`;
+            document.getElementById('punishment-screen').classList.remove('hidden');
+        }
+    }
+
+    function nextQuestion() {
+        currentQIndex++;
+        if (currentQIndex >= activeQuestions.length) {
+            alert("Luar biasa! Kamu telah menyelesaikan semua pertanyaan di mode ini!");
+            returnToMenu();
+            return;
+        }
+        
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        document.getElementById('game-container').classList.add('hidden');
+        document.getElementById('punishment-screen').classList.add('hidden');
+        document.getElementById('back-btn').classList.add('hidden');
+        document.getElementById('result-message').innerHTML = "";
+        
+        loadQuestion();
+    }
+
+    // MINI GAMES SYSTEM
+    function startGame(gameNum) {
+        activeMiniGame = gameNum;
+        document.getElementById('punishment-screen').classList.add('hidden');
+        document.getElementById('game-container').classList.remove('hidden');
+        document.getElementById('result-message').innerHTML = "";
+        
+        for(let i = 1; i <= 5; i++) {
+            document.getElementById(`game-${i}`).classList.add('hidden');
+        }
+        document.getElementById(`game-${gameNum}`).classList.remove('hidden');
+
+        if(gameNum === 1) initGame1();
+        if(gameNum === 2) initGame2();
+        if(gameNum === 4) initGame4();
+    }
+
+    function gameSuccess() {
+        document.getElementById('result-message').innerHTML = "<span style='color: var(--accent-green);'><i class='fa-solid fa-circle-check'></i> Hukuman Selesai! Kamu Boleh Lanjut.</span>";
+        document.getElementById('back-btn').classList.remove('hidden');
+    }
+
+    /* Game 1 */
+    let g1Target;
+    function initGame1() {
+        g1Target = Math.floor(Math.random() * 50) + 1;
+        document.getElementById('g1-msg').innerText = "";
+        document.getElementById('g1-input').value = "";
+    }
+    function playGame1() {
+        let val = parseInt(document.getElementById('g1-input').value);
+        let msg = document.getElementById('g1-msg');
+        if (isNaN(val)) return;
+        if (val === g1Target) {
+            msg.style.color = "var(--accent-green)";
+            msg.innerText = "Tebakan Benar!";
+            gameSuccess();
+        } else if (val < g1Target) {
+            msg.style.color = "var(--accent-yellow)";
+            msg.innerText = "Terlalu KECIL! Coba lagi.";
+        } else {
+            msg.style.color = "var(--accent-yellow)";
+            msg.innerText = "Terlalu BESAR! Coba lagi.";
+        }
+    }
+
+    /* Game 2 */
+    let g2State = "wait", g2Timer, g2StartTime;
+    function initGame2() {
+        let box = document.getElementById('g2-box');
+        box.style.background = "var(--accent-secondary)";
+        box.innerText = "TUNGGU...";
+        g2State = "wait";
+        document.getElementById('g2-msg').innerText = "";
+        
+        let randomDelay = Math.floor(Math.random() * 3000) + 2000;
+        clearTimeout(g2Timer);
+        g2Timer = setTimeout(() => {
+            box.style.background = "var(--accent-green)";
+            box.innerText = "KLIK!";
+            g2State = "ready";
+            g2StartTime = Date.now();
+        }, randomDelay);
+    }
+    function playGame2() {
+        let msg = document.getElementById('g2-msg');
+        if (g2State === "wait") {
+            clearTimeout(g2Timer);
+            msg.style.color = "var(--accent-secondary)";
+            msg.innerText = "Terlalu cepat! Mengulang...";
+            initGame2();
+        } else if (g2State === "ready") {
+            let reactionTime = Date.now() - g2StartTime;
+            msg.style.color = "var(--accent-green)";
+            msg.innerText = `Refleksmu: ${reactionTime} ms!`;
+            gameSuccess();
+            g2State = "done";
+        }
+    }
+
+    /* Game 3 */
+    function playGame3(playerChoice) {
+        const choices = ['Batu', 'Gunting', 'Kertas'];
+        const botChoice = choices[Math.floor(Math.random() * 3)];
+        let msg = document.getElementById('g3-msg');
+
+        if (playerChoice === botChoice) {
+            msg.style.color = "var(--accent-yellow)";
+            msg.innerText = `Guru memilih ${botChoice}. Seri! Coba lagi.`;
+        } else if (
+            (playerChoice === 'Batu' && botChoice === 'Gunting') ||
+            (playerChoice === 'Gunting' && botChoice === 'Kertas') ||
+            (playerChoice === 'Kertas' && botChoice === 'Batu')
+        ) {
+            msg.style.color = "var(--accent-green)";
+            msg.innerText = `Kamu (${playerChoice}) vs Guru (${botChoice}). Kamu MENANG!`;
+            gameSuccess();
+        } else {
+            msg.style.color = "var(--accent-secondary)";
+            msg.innerText = `Kamu (${playerChoice}) vs Guru (${botChoice}). Kamu Kalah! Coba lagi.`;
+        }
+    }
+
+    /* Game 4 */
+    let g4Ans;
+    function initGame4() {
+        let a = Math.floor(Math.random() * 12) + 3;
+        let b = Math.floor(Math.random() * 12) + 3;
+        g4Ans = a * b;
+        document.getElementById('g4-math-question').innerText = `${a} × ${b} = ?`;
+        document.getElementById('g4-msg').innerText = "";
+        document.getElementById('g4-input').value = "";
+    }
+    function playGame4() {
+        let val = document.getElementById('g4-input').value.trim();
+        let msg = document.getElementById('g4-msg');
+
+        if (parseInt(val) === g4Ans) {
+            msg.style.color = "var(--accent-green)";
+            msg.innerText = "Benar sekali!";
+            gameSuccess();
+        } else {
+            msg.style.color = "var(--accent-secondary)";
+            msg.innerText = "Salah! Hitung lagi.";
+        }
+    }
+
+    /* Game 5 */
+    let canvas = document.getElementById('g5-canvas');
+    let ctx = canvas.getContext('2d');
+    let player = { x: 135, y: 170, w: 30, h: 20 };
+    let enemy = { x: 100, y: 0, w: 20, h: 20, speed: 4 };
+    let g5Interval, g5TimeLeft = 8;
+    
+    function moveLeft() { if (player.x > 0) player.x -= 20; }
+    function moveRight() { if (player.x < canvas.width - player.w) player.x += 20; }
+
+    document.addEventListener('keydown', (e) => {
+        if (document.getElementById('game-5').classList.contains('hidden')) return;
+        if (e.key === "ArrowLeft") moveLeft();
+        if (e.key === "ArrowRight") moveRight();
+    });
+
+    document.getElementById('btn-left').addEventListener('click', moveLeft);
+    document.getElementById('btn-right').addEventListener('click', moveRight);
+
+    function startDodgeGame() {
+        document.getElementById('g5-start-btn').classList.add('hidden');
+        player.x = 135;
+        enemy.y = 0;
+        enemy.x = Math.random() * (canvas.width - 20);
+        g5TimeLeft = 8;
+        
+        clearInterval(g5Interval);
+        g5Interval = setInterval(() => {
+            enemy.y += enemy.speed;
+            if (enemy.y > canvas.height) {
+                enemy.y = 0;
+                enemy.x = Math.random() * (canvas.width - 20);
+            }
+
+            if (player.x < enemy.x + enemy.w &&
+                player.x + player.w > enemy.x &&
+                player.y < enemy.y + enemy.h &&
+                player.y + player.h > enemy.y) {
+                clearInterval(g5Interval);
+                document.getElementById('g5-msg').style.color = "var(--accent-secondary)";
+                document.getElementById('g5-msg').innerText = "💥 Terkena Rintangan!";
+                document.getElementById('g5-start-btn').classList.remove('hidden');
+                return;
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#10b981";
+            ctx.fillRect(player.x, player.y, player.w, player.h);
+            ctx.fillStyle = "#ff2a5f";
+            ctx.fillRect(enemy.x, enemy.y, enemy.w, enemy.h);
+
+            g5TimeLeft -= 0.03;
+            document.getElementById('g5-msg').style.color = "#fff";
+            document.getElementById('g5-msg').innerText = `Waktu Bertahan: ${Math.max(0, Math.ceil(g5TimeLeft))}s`;
+
+            if (g5TimeLeft <= 0) {
+                clearInterval(g5Interval);
+                document.getElementById('g5-msg').style.color = "var(--accent-green)";
+                document.getElementById('g5-msg').innerText = "Berhasil Lolos!";
+                gameSuccess();
+            }
+        }, 30);
+    }
+
+    // CHATBOT SYSTEM
+    function toggleChat() {
+        document.getElementById('chat-window').classList.toggle('hidden');
+    }
+
+    function handleChatKeyPress(e) {
+        if (e.key === 'Enter') sendChatMessage();
+    }
+
+    function triggerQuickAction(actionType) {
+        appendMessage('user', actionType);
+        setTimeout(() => {
+            let response = generateBotResponse(actionType.toLowerCase());
+            appendMessage('bot', response);
+        }, 300);
+    }
+
+    function sendChatMessage() {
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        appendMessage('user', text);
+        input.value = '';
+
+        setTimeout(() => {
+            let response = generateBotResponse(text);
+            appendMessage('bot', response);
+        }, 400);
+    }
+
+    function appendMessage(sender, text) {
+        const body = document.getElementById('chat-body');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `chat-bubble ${sender}`;
+        msgDiv.innerText = text;
+        body.appendChild(msgDiv);
+        body.scrollTop = body.scrollHeight;
+    }
+
+    function generateBotResponse(userMsg) {
+        const msg = userMsg.toLowerCase();
+
+        if (msg === "11714") {
+            isMasterUnlocked = true;
+            document.getElementById('chat-title').innerHTML = '<i class="fa-solid fa-user-ninja"></i> VIP Master Mode';
+            return "Akses diterima! Mode VIP Master aktif. Jawaban kuis dan game hukuman akan langsung dibocorkan!";
+        }
+
+        if (msg.includes('bocoran kuis') || msg.includes('bocoran') || msg.includes('hint')) {
+            if (activeQuestions.length === 0) return "Silakan pilih modul pelajaran terlebih dahulu!";
+            let q = activeQuestions[currentQIndex];
+            let rawAns = q.a[0];
+
+            if (isMasterUnlocked) {
+                return `🔓 [MODE MASTER] Jawaban pasti: ${rawAns.toUpperCase()}`;
+            } else {
+                return `🔑 [Hint]: Jawaban dimulai dengan huruf '${rawAns.charAt(0).toUpperCase()}' dengan panjang ${rawAns.length} Karakter!`;
+            }
+        }
+
+        if (msg.includes('bantu') || msg.includes('game') || msg.includes('bocor game')) {
+            if (activeMiniGame === 1) return `🤖 Angka Tebak Angka adalah: ${g1Target}`;
+            if (activeMiniGame === 4) return `🤖 Hasil Math Blitz adalah: ${g4Ans}`;
+            return "Bantuan aktif khusus untuk game Tebak Angka dan Math Blitz saat sedang dimainkan!";
+        }
+
+        return "Semangat belajarnya! Jika butuh petunjuk jawaban, tekan tombol 'Hint Soal' di atas.";
+    }
+</script>
+
+</body>
+</html>
